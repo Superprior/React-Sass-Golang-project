@@ -1,7 +1,6 @@
 import React from 'react'
 import './styles/code-area.sass'
 
-
 interface Props {}
 
 interface State {
@@ -18,7 +17,7 @@ class CodeArea extends React.Component<Props, State> {
             lineNumbers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
             lines: [
                 "import hashlib",
-                "\n",
+                "",
                 "def hash_file(filename):",
                 "\th = hashlib.sha1()",
                 "\twith open(filename,'rb') as file:",
@@ -26,12 +25,37 @@ class CodeArea extends React.Component<Props, State> {
                 "\t\twhile chunk != b'':",
                 "\t\t\tchunk = file.read(1024)",
                 "\t\t\th.update(chunk)",
-                "\n",
+                "",
                 "\treturn h.hexdigest()",
-                "\n",
+                "",
                 "message = hash_file(\"track1.mp3\")",
                 "print(message)"
             ],
+        }
+    }
+
+    componentDidMount(): void {
+        document.addEventListener("keydown", this.handleCursorMovement); 
+    }
+
+    handleCursorMovement = (event: KeyboardEvent): void => {
+        switch (event.key) {
+            case "ArrowRight": {
+                throw new Error('Not implemented yet');
+                break;
+            }
+            case "ArrowLeft": {
+                throw new Error('Not implemented yet');
+                break;
+            }
+            case "ArrowUp": {
+                throw new Error('Not implemented yet');
+                break;
+            }
+            case "ArrowDown": {
+                throw new Error('Not implemented yet');
+                break;
+            }
         }
     }
 
@@ -39,34 +63,26 @@ class CodeArea extends React.Component<Props, State> {
         return (
             <>
                 <div>
-                    <h1>This is the code area</h1>
                     <div className='code-area-wrapper'>
-                        <div className='line-numbering'>
-                            {
-                                this.state.lineNumbers.map((lineNumber: number) => {
-                                    return (
-                                        <pre>
+                        <span className='cursor'></span>
+                        {
+                            this.state.lineNumbers.map((lineNumber: number) => {
+                                return (
+                                    <div className='line'>
+                                        <div className='line-number-wrapper'>
                                             <span className='line-number'>
                                                 { lineNumber }
                                             </span>
-                                        </pre>
-                                    )
-                                })
-                            }
-                        </div>
-                        <div className='code-area'>
-                            {
-                                this.state.lines.map((line: string) => {
-                                    return (
-                                        <pre>
-                                            <span className='code-line'>
-                                                { line }
+                                        </div>
+                                        <div className='line-code-wrapper'>
+                                            <span className='line-code'>
+                                                { this.state.lines[lineNumber-1] }
                                             </span>
-                                        </pre>
-                                    )
-                                })
-                            }
-                        </div>
+                                        </div>
+                                    </div>
+                                )
+                            })
+                        }
                     </div>
                 </div>
             </>

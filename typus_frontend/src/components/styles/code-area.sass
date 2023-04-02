@@ -1,21 +1,45 @@
 
 .code-area-wrapper
+    position: relative
     background-color: #1A1A1A
-    line-height: 0.35
+    line-height: 1.5
     padding: 10px 0px
+    display: block
+
+
+.line
+    font-size: 1rem
     display: flex
-
-
-.line-numbering *
+    white-space: pre
     font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace
-    padding-right: 1rem
+
+.line-number-wrapper
+    padding-inline: 10px
+    width: 40px
+    border-right: 2px solid #323232
 
 .line-number
     color: #727272
+    float: right
 
 
-.code-area *
-    font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace
+.line-code-wrapper
+    display: flex
+    padding-inline-start: 10px
 
-.code-line
+.line-code
     color: #efefef
+
+@keyframes cursor-blink
+    from, to
+        background-color: #F1F1F1
+    50%
+        background-color: #1A1A1A
+
+.cursor
+    display: inline-block
+    position: absolute
+    animation: cursor-blink .75s infinite
+    background-color: #F1F1F1
+    height: 1.5rem
+    width: 2px
