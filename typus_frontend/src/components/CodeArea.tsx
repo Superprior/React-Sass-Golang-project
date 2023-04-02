@@ -5,7 +5,8 @@ interface Props {}
 
 interface State {
     lineNumbers: number[];
-    lines: string[];
+    lines: string[][];
+    cursorCoords: [number, number];
 }
 
 
@@ -14,22 +15,23 @@ class CodeArea extends React.Component<Props, State> {
         super(props);
 
         this.state = {
-            lineNumbers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+            lineNumbers: [1, 2, 3, 4], //, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+            cursorCoords: [0, 0],
             lines: [
-                "import hashlib",
-                "",
-                "def hash_file(filename):",
-                "\th = hashlib.sha1()",
-                "\twith open(filename,'rb') as file:",
-                "\t\tchunk = 0",
-                "\t\twhile chunk != b'':",
-                "\t\t\tchunk = file.read(1024)",
-                "\t\t\th.update(chunk)",
-                "",
-                "\treturn h.hexdigest()",
-                "",
-                "message = hash_file(\"track1.mp3\")",
-                "print(message)"
+                ["i", "m", "p", "o", "r", "t", " ", "h", "a", "s", "h", "l", "i", "b"],
+                [""],
+                ["d", "e", "f", " ", "h", "a", "s", "h", "_", "f", "i", "l", "e", "(", "f", "i", "l", "e", "n", "a", "m", "e", ")", ":"],
+                ["\t", "h", " ", "=", " ", "h", "a", "s", "h", "l", "i", "b", ".", "s", "h", "a", "1", "(", ")"]
+                // "\twith open(filename,'rb') as file:",
+                // "\t\tchunk = 0",
+                // "\t\twhile chunk != b'':",
+                // "\t\t\tchunk = file.read(1024)",
+                // "\t\t\th.update(chunk)",
+                // "",
+                // "\treturn h.hexdigest()",
+                // "",
+                // "message = hash_file(\"track1.mp3\")",
+                // "print(message)"
             ],
         }
     }
@@ -41,19 +43,27 @@ class CodeArea extends React.Component<Props, State> {
     handleCursorMovement = (event: KeyboardEvent): void => {
         switch (event.key) {
             case "ArrowRight": {
-                throw new Error('Not implemented yet');
+                if (this.state.cursorCoords[0] < this.state.lines[this.state.cursorCoords[1]].length) {
+                    this.setState({ cursorCoords: [this.state.cursorCoords[0] + 1, this.state.cursorCoords[1]]});
+                }
                 break;
             }
             case "ArrowLeft": {
-                throw new Error('Not implemented yet');
+                if (this.state.cursorCoords[0] > 0) {
+                    this.setState({ cursorCoords: [this.state.cursorCoords[0] - 1, this.state.cursorCoords[1]]});
+                }
                 break;
             }
             case "ArrowUp": {
-                throw new Error('Not implemented yet');
+                if (this.state.cursorCoords[1] > 0) {
+                    this.setState({ cursorCoords: [this.state.cursorCoords[0], this.state.cursorCoords[1] - 1]});
+                }
                 break;
             }
             case "ArrowDown": {
-                throw new Error('Not implemented yet');
+                if (this.state.cursorCoords[1] < this.state.lines.length) {
+                    this.setState({ cursorCoords: [this.state.cursorCoords[0], this.state.cursorCoords[1] + 1]});
+                }
                 break;
             }
         }
@@ -64,9 +74,8 @@ class CodeArea extends React.Component<Props, State> {
             <>
                 <div>
                     <div className='code-area-wrapper'>
-                        <span className='cursor'></span>
                         {
-                            this.state.lineNumbers.map((lineNumber: number) => {
+                            this.state.lineNumbers.map((lineNumber: number, yCoord: number) => {
                                 return (
                                     <div className='line'>
                                         <div className='line-number-wrapper'>
@@ -75,9 +84,18 @@ class CodeArea extends React.Component<Props, State> {
                                             </span>
                                         </div>
                                         <div className='line-code-wrapper'>
-                                            <span className='line-code'>
-                                                { this.state.lines[lineNumber-1] }
-                                            </span>
+                                            { this.state.lines[lineNumber - 1].map((char: string, xCoord: number) => {
+                                                return (
+                                                    <div style={{ display: 'flex'}}>
+                                                        <span className='line-code'>
+                                                            { char }
+                                                        </span>
+                                                        { this.state.cursorCoords[0] === xCoord && this.state.cursorCoords[1] === yCoord ? (
+                                                            <span className='cursor'></span>
+                                                        ) : null }
+                                                    </div>
+                                                )
+                                            })}
                                         </div>
                                     </div>
                                 )
