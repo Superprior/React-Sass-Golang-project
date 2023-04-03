@@ -19,7 +19,7 @@ class CodeArea extends React.Component<Props, State> {
             cursorCoords: [0, 0],
             lines: [
                 ["i", "m", "p", "o", "r", "t", " ", "h", "a", "s", "h", "l", "i", "b"],
-                [""],
+                [],
                 ["d", "e", "f", " ", "h", "a", "s", "h", "_", "f", "i", "l", "e", "(", "f", "i", "l", "e", "n", "a", "m", "e", ")", ":"],
                 [" ", " ", " ", " ", "h", " ", "=", " ", "h", "a", "s", "h", "l", "i", "b", ".", "s", "h", "a", "1", "(", ")"]
                 // "\twith open(filename,'rb') as file:",
@@ -57,13 +57,19 @@ class CodeArea extends React.Component<Props, State> {
             case "ArrowUp": {
                 if (this.state.cursorCoords[1] > 0) {
                     this.setState({ cursorCoords: [this.state.cursorCoords[0], this.state.cursorCoords[1] - 1]});
+                    if (this.state.lines[this.state.cursorCoords[1] - 1].length <= this.state.cursorCoords[0]) {
+                        this.setState({ cursorCoords: [this.state.lines[this.state.cursorCoords[1] - 1].length, this.state.cursorCoords[1] - 1] })
+                    }
                 }
                 break;
             }
             case "ArrowDown": {
                 if (this.state.cursorCoords[1] < this.state.lineNumbers.length - 1) {
                     this.setState({ cursorCoords: [this.state.cursorCoords[0], this.state.cursorCoords[1] + 1]});
-                }
+                    if (this.state.lines[this.state.cursorCoords[1] + 1].length <= this.state.cursorCoords[0]) {
+                        this.setState({ cursorCoords: [this.state.lines[this.state.cursorCoords[1] + 1].length, this.state.cursorCoords[1] + 1]});
+                    }
+                } 
                 break;
             }
         }
@@ -101,6 +107,9 @@ class CodeArea extends React.Component<Props, State> {
                                                     </div>
                                                 )
                                             })}
+                                            { this.state.lines[lineNumber - 1].length === 0 && this.state.cursorCoords[1] === yCoord ? (
+                                                <span className='cursor' style={{ position: 'relative' }}></span>
+                                            ) : null }
                                         </div>
                                     </div>
                                 )
