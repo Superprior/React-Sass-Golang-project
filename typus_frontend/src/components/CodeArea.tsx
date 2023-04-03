@@ -21,7 +21,7 @@ class CodeArea extends React.Component<Props, State> {
                 ["i", "m", "p", "o", "r", "t", " ", "h", "a", "s", "h", "l", "i", "b"],
                 [""],
                 ["d", "e", "f", " ", "h", "a", "s", "h", "_", "f", "i", "l", "e", "(", "f", "i", "l", "e", "n", "a", "m", "e", ")", ":"],
-                ["\t", "h", " ", "=", " ", "h", "a", "s", "h", "l", "i", "b", ".", "s", "h", "a", "1", "(", ")"]
+                [" ", " ", " ", " ", "h", " ", "=", " ", "h", "a", "s", "h", "l", "i", "b", ".", "s", "h", "a", "1", "(", ")"]
                 // "\twith open(filename,'rb') as file:",
                 // "\t\tchunk = 0",
                 // "\t\twhile chunk != b'':",
@@ -61,7 +61,7 @@ class CodeArea extends React.Component<Props, State> {
                 break;
             }
             case "ArrowDown": {
-                if (this.state.cursorCoords[1] < this.state.lines.length) {
+                if (this.state.cursorCoords[1] < this.state.lineNumbers.length - 1) {
                     this.setState({ cursorCoords: [this.state.cursorCoords[0], this.state.cursorCoords[1] + 1]});
                 }
                 break;
@@ -86,12 +86,17 @@ class CodeArea extends React.Component<Props, State> {
                                         <div className='line-code-wrapper'>
                                             { this.state.lines[lineNumber - 1].map((char: string, xCoord: number) => {
                                                 return (
-                                                    <div style={{ display: 'flex'}}>
-                                                        <span className='line-code'>
-                                                            { char }
-                                                        </span>
-                                                        { this.state.cursorCoords[0] === xCoord && this.state.cursorCoords[1] === yCoord ? (
-                                                            <span className='cursor'></span>
+                                                    <div style={{ display: 'flex' }}>
+                                                        <div style={{ display: 'flex'}}>
+                                                            <span className='line-code'>
+                                                                { char }
+                                                            </span>
+                                                            { this.state.cursorCoords[0] === xCoord && this.state.cursorCoords[1] === yCoord ? (
+                                                                <span className='cursor'></span>
+                                                            ) : null }
+                                                        </div>
+                                                        { this.state.cursorCoords[0] === this.state.lines[yCoord].length && xCoord + 1 === this.state.lines[yCoord].length &&  this.state.cursorCoords[1] === yCoord ? (
+                                                            <span className='cursor' style={{ position: 'relative' }}></span>
                                                         ) : null }
                                                     </div>
                                                 )
