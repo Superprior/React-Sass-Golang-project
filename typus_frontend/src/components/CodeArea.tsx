@@ -1,6 +1,8 @@
 import React from 'react'
 import './styles/code-area.sass'
 import { CodeCharacter, CodeLine, Cursor } from '../interfaces';
+import isCodeCymbol from '../lib/isCodeCymbol';
+
 
 
 interface Props {}
@@ -48,7 +50,7 @@ class CodeArea extends React.Component<Props, State> {
         }
 
         this.setState({ lines: hardcodedCodeLines })
-        document.addEventListener("keydown", this.handleCursorMovement); 
+        document.addEventListener("keydown", this.handleCursorMovement);
     }
 
     handleCursorMovement = (event: KeyboardEvent): void => {
@@ -106,7 +108,7 @@ class CodeArea extends React.Component<Props, State> {
                                                     return (
                                                         <div style={{ display: 'flex' }} key={`${lineNumber}:${charIndex}`}>
                                                             <div style={{ display: 'flex'}}>
-                                                                <span className='line-code'>
+                                                                <span className='line-code' style={{ opacity: `${char.wasTyped ? '1' : '0.5'}` }}>
                                                                     { char.c }
                                                                 </span>
                                                                 { this.state.cursor.x === charIndex && this.state.cursor.y === lineNumber ? (
