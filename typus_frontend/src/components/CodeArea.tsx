@@ -54,13 +54,17 @@ class CodeArea extends React.Component<Props, State> {
     }
 
     handleKeyboard = (event: KeyboardEvent): void => {
-        if (isCodeSymbol(event.key)) {
+        if (isCodeSymbol(event.key) && this.state.cursor.x < this.state.lines[this.state.cursor.y].chars.length) {
             const currentSymbolToType = this.state.lines[this.state.cursor.y].chars[this.state.cursor.x].c;
             if (event.key === currentSymbolToType) {
                 this.state.lines[this.state.cursor.y].chars[this.state.cursor.x].wasTyped = true;
                 this.setState({ cursor: {x: this.state.cursor.x + 1, y: this.state.cursor.y }});
             }   
-        }
+            return;
+        } else if (event.key === "Enter" && this.state.cursor.y < this.state.lines.length - 1) {
+            this.setState({ cursor: { x: 0, y: this.state.cursor.y + 1 }});
+            return;
+        }  
 
         switch (event.key) {
             case "ArrowRight": {
