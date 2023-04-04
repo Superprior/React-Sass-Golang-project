@@ -61,43 +61,11 @@ class CodeArea extends React.Component<Props, State> {
                 this.setState({ cursor: {x: this.state.cursor.x + 1, y: this.state.cursor.y }});
             }   
             return;
-        } else if (event.key === "Enter" && this.state.cursor.y < this.state.lines.length - 1) {
+        } else if (event.key === "Enter" && this.state.cursor.y < this.state.lines.length - 1 && 
+                   this.state.cursor.x === this.state.lines[this.state.cursor.y].chars.length) {
             this.setState({ cursor: { x: 0, y: this.state.cursor.y + 1 }});
             return;
         }  
-
-        switch (event.key) {
-            case "ArrowRight": {
-                if (this.state.cursor.x < this.state.lines[this.state.cursor.y].chars.length) {
-                    this.setState({ cursor: { x: this.state.cursor.x + 1, y: this.state.cursor.y }})
-                }
-                break;
-            }
-            case "ArrowLeft": {
-                if (this.state.cursor.x > 0) {
-                    this.setState({ cursor: { x: this.state.cursor.x - 1, y: this.state.cursor.y }})
-                }
-                break;
-            }
-            case "ArrowUp": {
-                if (this.state.cursor.y > 0) {
-                    this.setState({ cursor: { x: this.state.cursor.x, y: this.state.cursor.y - 1 }});
-                    if (this.state.lines[this.state.cursor.y - 1].chars.length <= this.state.cursor.x) {
-                        this.setState({ cursor: { x: this.state.lines[this.state.cursor.y - 1].chars.length, y: this.state.cursor.y - 1 }})
-                    }
-                }
-                break;
-            }
-            case "ArrowDown": {
-                if (this.state.cursor.y < this.state.lines.length - 1) {
-                    this.setState({ cursor: { x: this.state.cursor.x, y: this.state.cursor.y + 1 }});
-                    if (this.state.lines[this.state.cursor.y + 1].chars.length <= this.state.cursor.x) {
-                        this.setState({ cursor: { x: this.state.lines[this.state.cursor.y + 1].chars.length, y: this.state.cursor.y + 1 }});
-                    }
-                } 
-                break;
-            }
-        }
     }
 
     render() {
