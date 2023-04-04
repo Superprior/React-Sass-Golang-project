@@ -15,7 +15,7 @@ interface State {
      */
 
     cursor: Cursor;
-    lines: CodeLine[] | null;
+    lines: CodeLine[];
 }
 
 
@@ -25,7 +25,7 @@ class CodeArea extends React.Component<Props, State> {
 
         this.state = {
             cursor: { x: 0, y: 0 },
-            lines: null,
+            lines: [],
         }
     }
 
@@ -48,44 +48,43 @@ class CodeArea extends React.Component<Props, State> {
         }
 
         this.setState({ lines: hardcodedCodeLines })
-        // document.addEventListener("keydown", this.handleCursorMovement); 
+        document.addEventListener("keydown", this.handleCursorMovement); 
     }
 
-    // handleCursorMovement = (event: KeyboardEvent): void => {
-    //     alert(event.key);
-    //     switch (event.key) {
-    //         case "ArrowRight": {
-    //             if (this.state.cursorCoords[0] < this.state.lines[this.state.cursorCoords[1]].length) {
-    //                 this.setState({ cursorCoords: [this.state.cursorCoords[0] + 1, this.state.cursorCoords[1]]});
-    //             }
-    //             break;
-    //         }
-    //         case "ArrowLeft": {
-    //             if (this.state.cursorCoords[0] > 0) {
-    //                 this.setState({ cursorCoords: [this.state.cursorCoords[0] - 1, this.state.cursorCoords[1]]});
-    //             }
-    //             break;
-    //         }
-    //         case "ArrowUp": {
-    //             if (this.state.cursorCoords[1] > 0) {
-    //                 this.setState({ cursorCoords: [this.state.cursorCoords[0], this.state.cursorCoords[1] - 1]});
-    //                 if (this.state.lines[this.state.cursorCoords[1] - 1].length <= this.state.cursorCoords[0]) {
-    //                     this.setState({ cursorCoords: [this.state.lines[this.state.cursorCoords[1] - 1].length, this.state.cursorCoords[1] - 1] })
-    //                 }
-    //             }
-    //             break;
-    //         }
-    //         case "ArrowDown": {
-    //             if (this.state.cursorCoords[1] < this.state.lineNumbers.length - 1) {
-    //                 this.setState({ cursorCoords: [this.state.cursorCoords[0], this.state.cursorCoords[1] + 1]});
-    //                 if (this.state.lines[this.state.cursorCoords[1] + 1].length <= this.state.cursorCoords[0]) {
-    //                     this.setState({ cursorCoords: [this.state.lines[this.state.cursorCoords[1] + 1].length, this.state.cursorCoords[1] + 1]});
-    //                 }
-    //             } 
-    //             break;
-    //         }
-    //     }
-    // }
+    handleCursorMovement = (event: KeyboardEvent): void => {
+        switch (event.key) {
+            case "ArrowRight": {
+                if (this.state.cursor.x < this.state.lines[this.state.cursor.y].chars.length) {
+                    this.setState({ cursor: { x: this.state.cursor.x + 1, y: this.state.cursor.y }})
+                }
+                break;
+            }
+            case "ArrowLeft": {
+                if (this.state.cursor.x > 0) {
+                    this.setState({ cursor: { x: this.state.cursor.x - 1, y: this.state.cursor.y }})
+                }
+                break;
+            }
+            case "ArrowUp": {
+                if (this.state.cursor.y > 0) {
+                    this.setState({ cursor: { x: this.state.cursor.x, y: this.state.cursor.y - 1 }});
+                    if (this.state.lines[this.state.cursor.y - 1].chars.length <= this.state.cursor.x) {
+                        this.setState({ cursor: { x: this.state.lines[this.state.cursor.y - 1].chars.length, y: this.state.cursor.y - 1 }})
+                    }
+                }
+                break;
+            }
+            case "ArrowDown": {
+                if (this.state.cursor.y < this.state.lines.length - 1) {
+                    this.setState({ cursor: { x: this.state.cursor.x, y: this.state.cursor.y + 1 }});
+                    if (this.state.lines[this.state.cursor.y + 1].chars.length <= this.state.cursor.x) {
+                        this.setState({ cursor: { x: this.state.lines[this.state.cursor.y + 1].chars.length, y: this.state.cursor.y + 1 }});
+                    }
+                } 
+                break;
+            }
+        }
+    }
 
     render() {
         return (
@@ -102,7 +101,7 @@ class CodeArea extends React.Component<Props, State> {
                                             </span>
                                         </div>
                                         <div className='line-code-wrapper'>
-                                            { this.state.lines?[lineNumber] ? (
+                                            {    
                                                 this.state.lines[lineNumber].chars.map((char: CodeCharacter, charIndex: number) => {
                                                     return (
                                                         <div style={{ display: 'flex' }} key={`${lineNumber}:${charIndex}`}>
@@ -110,20 +109,19 @@ class CodeArea extends React.Component<Props, State> {
                                                                 <span className='line-code'>
                                                                     { char.c }
                                                                 </span>
-                                                                {/* { this.state.cursorCoords[0] === xCoord && this.state.cursorCoords[1] === yCoord ? (
+                                                                { this.state.cursor.x === charIndex && this.state.cursor.y === lineNumber ? (
                                                                     <span className='cursor'></span>
-                                                                ) : null } */}
+                                                                ) : null }
                                                             </div>
-                                                            {/* { this.state.cursorCoords[0] === this.state.lines[yCoord].length && xCoord + 1 === this.state.lines[yCoord].length &&  this.state.cursorCoords[1] === yCoord ? (
+                                                            { this.state.cursor.x === this.state.lines[lineNumber].chars.length && charIndex + 1 === this.state.lines[lineNumber].chars.length &&  this.state.cursor.y === lineNumber ? (
                                                                 <span className='cursor' style={{ position: 'relative' }}></span>
-                                                            ) : null } */}
+                                                            ) : null }
                                                         </div>
                                                     )
                                                 })
-                                                // { this.state.lines[lineNumber - 1].length === 0 && this.state.cursorCoords[1] === yCoord ? (
-                                                //     <span className='cursor' style={{ position: 'relative' }}></span>
-                                                // ) : null }
-                                                ) : ( <h1>An error ocurred...</h1> 
+                                            }
+                                            { this.state.lines[lineNumber].chars.length === 0 && this.state.cursor.y === lineNumber ? (
+                                                <span className='cursor' style={{ position: 'relative' }}></span>
                                             ) : null }
                                         </div>
                                     </div>
