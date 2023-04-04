@@ -1,7 +1,7 @@
 import React from 'react'
 import './styles/code-area.sass'
 import { CodeCharacter, CodeLine, Cursor } from '../interfaces';
-import isCodeCymbol from '../lib/isCodeCymbol';
+import isCodeSymbol from '../lib/isCodeSymbol';
 
 
 
@@ -50,10 +50,18 @@ class CodeArea extends React.Component<Props, State> {
         }
 
         this.setState({ lines: hardcodedCodeLines })
-        document.addEventListener("keydown", this.handleCursorMovement);
+        document.addEventListener("keydown", this.handleKeyboard);
     }
 
-    handleCursorMovement = (event: KeyboardEvent): void => {
+    handleKeyboard = (event: KeyboardEvent): void => {
+        if (isCodeSymbol(event.key)) {
+            const currentSymbolToType = this.state.lines[this.state.cursor.y].chars[this.state.cursor.x].c;
+            if (event.key === currentSymbolToType) {
+                this.state.lines[this.state.cursor.y].chars[this.state.cursor.x].wasTyped = true;
+                this.setState({ cursor: {x: this.state.cursor.x + 1, y: this.state.cursor.y }});
+            }   
+        }
+
         switch (event.key) {
             case "ArrowRight": {
                 if (this.state.cursor.x < this.state.lines[this.state.cursor.y].chars.length) {
@@ -115,7 +123,9 @@ class CodeArea extends React.Component<Props, State> {
                                                                     <span className='cursor'></span>
                                                                 ) : null }
                                                             </div>
-                                                            { this.state.cursor.x === this.state.lines[lineNumber].chars.length && charIndex + 1 === this.state.lines[lineNumber].chars.length &&  this.state.cursor.y === lineNumber ? (
+                                                            { this.state.cursor.x === this.state.lines[lineNumber].chars.length && 
+                                                              charIndex + 1 === this.state.lines[lineNumber].chars.length &&
+                                                              this.state.cursor.y === lineNumber ? (
                                                                 <span className='cursor' style={{ position: 'relative' }}></span>
                                                             ) : null }
                                                         </div>
