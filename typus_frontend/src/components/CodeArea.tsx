@@ -1,6 +1,6 @@
 import React from 'react'
 import './styles/code-area.sass'
-import { CodeLine, Cursor } from '../interfaces';
+import { CodeCharacter, CodeLine, Cursor } from '../interfaces';
 
 
 interface Props {}
@@ -91,47 +91,46 @@ class CodeArea extends React.Component<Props, State> {
         return (
             <>
                 <div>
-                    <h1>--- Code Area ---</h1>
-                    <button onClick={() => console.log(this.state.lines)}>
-                        View lines state
-                    </button>
-                    {/* <div className='code-area-wrapper'>
+                    <div className='code-area-wrapper'>
                         {
-                            this.state.lineNumbers.map((lineNumber: number, yCoord: number) => {
+                            this.state.lines?.map((line: CodeLine, lineNumber: number) => {
                                 return (
-                                    <div className='line'>
+                                    <div className='line' key={lineNumber}>
                                         <div className='line-number-wrapper'>
                                             <span className='line-number'>
-                                                { lineNumber }
+                                                { lineNumber + 1 }
                                             </span>
                                         </div>
                                         <div className='line-code-wrapper'>
-                                            { this.state.lines[lineNumber - 1].map((char: string, xCoord: number) => {
-                                                return (
-                                                    <div style={{ display: 'flex' }}>
-                                                        <div style={{ display: 'flex'}}>
-                                                            <span className='line-code'>
-                                                                { char }
-                                                            </span>
-                                                            { this.state.cursorCoords[0] === xCoord && this.state.cursorCoords[1] === yCoord ? (
-                                                                <span className='cursor'></span>
-                                                            ) : null }
+                                            { this.state.lines?[lineNumber] ? (
+                                                this.state.lines[lineNumber].chars.map((char: CodeCharacter, charIndex: number) => {
+                                                    return (
+                                                        <div style={{ display: 'flex' }} key={`${lineNumber}:${charIndex}`}>
+                                                            <div style={{ display: 'flex'}}>
+                                                                <span className='line-code'>
+                                                                    { char.c }
+                                                                </span>
+                                                                {/* { this.state.cursorCoords[0] === xCoord && this.state.cursorCoords[1] === yCoord ? (
+                                                                    <span className='cursor'></span>
+                                                                ) : null } */}
+                                                            </div>
+                                                            {/* { this.state.cursorCoords[0] === this.state.lines[yCoord].length && xCoord + 1 === this.state.lines[yCoord].length &&  this.state.cursorCoords[1] === yCoord ? (
+                                                                <span className='cursor' style={{ position: 'relative' }}></span>
+                                                            ) : null } */}
                                                         </div>
-                                                        { this.state.cursorCoords[0] === this.state.lines[yCoord].length && xCoord + 1 === this.state.lines[yCoord].length &&  this.state.cursorCoords[1] === yCoord ? (
-                                                            <span className='cursor' style={{ position: 'relative' }}></span>
-                                                        ) : null }
-                                                    </div>
-                                                )
-                                            })}
-                                            { this.state.lines[lineNumber - 1].length === 0 && this.state.cursorCoords[1] === yCoord ? (
-                                                <span className='cursor' style={{ position: 'relative' }}></span>
+                                                    )
+                                                })
+                                                // { this.state.lines[lineNumber - 1].length === 0 && this.state.cursorCoords[1] === yCoord ? (
+                                                //     <span className='cursor' style={{ position: 'relative' }}></span>
+                                                // ) : null }
+                                                ) : ( <h1>An error ocurred...</h1> 
                                             ) : null }
                                         </div>
                                     </div>
                                 )
                             })
                         }
-                    </div> */}
+                    </div>
                 </div>
             </>
         )
