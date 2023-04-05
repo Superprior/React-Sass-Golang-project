@@ -2,14 +2,14 @@ import React from 'react'
 import './styles/code-area.sass'
 import { CodeCharacter, CodeLine, Cursor } from '../interfaces';
 import isCodeSymbol from '../lib/isCodeSymbol';
-
+import getParseCodeFromAPI from '../lib/getParseCodeFromAPI';
 
 
 interface Props {}
 
 interface State {
     /**
-     * This interface represents the state of the CodeArea. 
+     * this interface represents the state of the CodeArea. 
      * 
      * @param {Cursor} cursor - The cursor.
      * @param {CodeLine[]} lines - An array of the code lines. Gets its value in componentDidMount().
@@ -32,33 +32,9 @@ class CodeArea extends React.Component<Props, State> {
     }
 
     async componentDidMount() {
-        const initialHardcodedCodeLines = [
-                ['i', 'm', 'p', 'o', 'r', 't', ' ', 'h', 'a', 's', 'h', 'l', 'i', 'b'], 
-                [], 
-                ['d', 'e', 'f', ' ', 'h', 'a', 's', 'h', '_', 'f', 'i', 'l', 'e', '(', 'f', 'i', 'l', 'e', 'n', 'a', 'm', 'e', ')', ':'], 
-                [' ', ' ', ' ', 'h', ' ', '=', ' ', 'h', 'a', 's', 'h', 'l', 'i', 'b', '.', 's', 'h', 'a', '1', '(', ')'], 
-                [], 
-                [' ', ' ', ' ', 'w', 'i', 't', 'h', ' ', 'o', 'p', 'e', 'n', '(', 'f', 'i', 'l', 'e', 'n', 'a', 'm', 'e', ',', "'", 'r', 'b', "'", ')', ' ', 'a', 's', ' ', 'f', 'i', 'l', 'e', ':'],
-                [' ', ' ', ' ', ' ', ' ', ' ', ' ', 'c', 'h', 'u', 'n', 'k', ' ', '=', ' ', '0'], 
-                [' ', ' ', ' ', ' ', ' ', ' ', ' ', 'w', 'h', 'i', 'l', 'e', ' ', 'c', 'h', 'u', 'n', 'k', ' ', '!', '=', ' ', 'b', "'", "'", ':'], 
-                [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'c', 'h', 'u', 'n', 'k', ' ', '=', ' ', 'f', 'i', 'l', 'e', '.', 'r', 'e', 'a', 'd', '(', '1', '0', '2', '4', ')'], 
-                [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'h', '.', 'u', 'p', 'd', 'a', 't', 'e', '(', 'c', 'h', 'u', 'n', 'k', ')', '\n'], ['\n'], [' ', ' ', ' ', 'r', 'e', 't', 'u', 'r', 'n', ' ', 'h', '.', 'h', 'e', 'x', 'd', 'i', 'g', 'e', 's', 't', '(', ')'],
-                [], 
-                ['m', 'e', 's', 's', 'a', 'g', 'e', ' ', '=', ' ', 'h', 'a', 's', 'h', '_', 'f', 'i', 'l', 'e', '(', '"', 't', 'r', 'a', 'c', 'k', '1', '.', 'm', 'p', '3', '"', ')'], 
-                ['p', 'r', 'i', 'n', 't', '(', 'm', 'e', 's', 's', 'a', 'g', 'e', ')']
-        ];
-        
-        let hardcodedCodeLines: CodeLine[] = [];
+        const testCodeSample = await getParseCodeFromAPI({ isTest: true });
+        this.setState({ lines: testCodeSample });
 
-        for (let i = 0; i < initialHardcodedCodeLines.length; i++) {
-            let codeLine: CodeLine = { chars: [] };
-            for (let j = 0; j < initialHardcodedCodeLines[i].length; j++) {
-                codeLine.chars.push({ c: initialHardcodedCodeLines[i][j], wasTyped: false });
-            }
-            hardcodedCodeLines.push(codeLine);
-        }
-
-        this.setState({ lines: hardcodedCodeLines })
         document.addEventListener("keydown", this.handleKeyboard);
     }
 
