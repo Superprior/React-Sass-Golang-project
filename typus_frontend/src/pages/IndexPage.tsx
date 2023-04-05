@@ -1,9 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 import CodeArea from '../components/CodeArea'
 import './styles/index.sass'
 
 
-const IndexPage: React.FC<{}> = () => {
+interface Props {}
+
+const IndexPage: React.FC<{}> = (props: Props) => {
+
     return (
         <>
             <CodeArea />

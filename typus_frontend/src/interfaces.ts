@@ -2,11 +2,10 @@ export interface CodeCharacter {
     /**
      * This interface represents a single character of code.
      * 
-     * @param {string} c - The character itself.
-     * @param {boolean} wasTyped - Represents if the character was already typed by a user. Should be false by default.
+     * @param {string}  c             - The character itself.
+     * @param {boolean} wasTyped      - Represents if the character was already typed by a user. Should be false by default.
      * @param {boolean} isHighlighted - Determines if the character is highlighted. 
-     * This parameter is used for marking a character if it was typed incorrectly.
-     * 
+     *                                  This parameter is used for marking a character if it was typed incorrectly.
      */
 
     c: string;

@@ -6,8 +6,8 @@ interface Props {
     /**
      * Parameters of the getParseCodeFromAPI function.
      * 
-     * @param {string} exampleId - A unique id of the example the user wants to retrieve
-     * @param {boolean} isTest - Determines if the test sample is needed [dev purposes]
+     * @param {string}  exampleId - A unique id of the example the user wants to retrieve
+     * @param {boolean} isTest    - Determines if the test sample is needed [dev purposes]
      * 
      */
     exampleId?: string;
