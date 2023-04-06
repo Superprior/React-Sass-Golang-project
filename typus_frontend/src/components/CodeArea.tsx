@@ -27,6 +27,10 @@ const CodeArea: React.FC<{}> = (props: Props): JSX.Element => {
     useEffect(() => {
         setLines(codeSample);
         document.addEventListener("keydown", handleKeyboard);
+
+        return () => {
+            document.removeEventListener("keydown", handleKeyboard);
+        }
     }, [codeSample]);
 
     const handleKeyboard = (event: KeyboardEvent): void => {
