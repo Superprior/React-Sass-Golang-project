@@ -1,117 +1,98 @@
-import React from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import './styles/code-area.sass'
 import { CodeCharacter, CodeLine, Cursor } from '../interfaces';
 import isCodeSymbol from '../lib/isCodeSymbol';
-import getParseCodeFromAPI from '../lib/getParseCodeFromAPI';
-import { BiReset } from 'react-icons/bi';
+import useCodeSample from '../hooks/useCodeSample';
 
 
 interface Props {}
 
-interface State {
-    /**
-     * this interface represents the state of the CodeArea. 
-     * 
-     * @param {Cursor}     cursor - The cursor.
-     * @param {CodeLine[]} lines  - An array of the code lines. Gets its value in componentDidMount().
-     * 
-     */
+const CodeArea: React.FC<{}> = (props: Props): JSX.Element => {
+    const codeSample = useCodeSample({isTest: true});
+    const [lines, _setLines] = useState<CodeLine[]>([]);
+    const [csr, _setCsr] = useState<Cursor>({ x: 0, y: 0});
 
-    cursor: Cursor;
-    lines: CodeLine[];
-}
+    const lnsRef = useRef(lines);
+    const csrRef = useRef(csr);
 
-
-class CodeArea extends React.Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
-
-        this.state = {
-            cursor: { x: 0, y: 0 },
-            lines: [],
-        }
+    const setLines = (data: CodeLine[]): void => {
+        lnsRef.current = data;
+        _setLines(data);
+    }
+    const setCsr = (data: Cursor): void => {
+        csrRef.current = data;
+        _setCsr(data);
     }
 
-    async componentDidMount() {
-        const testCodeSample = await getParseCodeFromAPI({ isTest: true });
-        this.setState({ lines: testCodeSample });
+    useEffect(() => {
+        setLines(codeSample);
+        document.addEventListener("keydown", handleKeyboard);
+    }, [codeSample]);
 
-        document.addEventListener("keydown", this.handleKeyboard);
-    }
-
-    resetState = async(): Promise<void> => {
-        const testCodeSample = await getParseCodeFromAPI({ isTest: true });
-        this.setState({ lines: testCodeSample });
-        this.setState({ cursor: { x: 0, y: 0 }});
-    }
-
-    handleKeyboard = (event: KeyboardEvent): void => {
-        if (isCodeSymbol(event.key) && this.state.cursor.x < this.state.lines[this.state.cursor.y].chars.length) {
-            const currentSymbolToType = this.state.lines[this.state.cursor.y].chars[this.state.cursor.x].c;
+    const handleKeyboard = (event: KeyboardEvent): void => {
+        if (isCodeSymbol(event.key) && csrRef.current.x < lnsRef.current[csrRef.current.y].chars.length) {
+            const currentSymbolToType = lnsRef.current[csrRef.current.y].chars[csrRef.current.x].c;
             if (event.key === currentSymbolToType) {
-                this.state.lines[this.state.cursor.y].chars[this.state.cursor.x].wasTyped = true;
-                this.setState({ cursor: {x: this.state.cursor.x + 1, y: this.state.cursor.y }});
+                lnsRef.current[csrRef.current.y].chars[csrRef.current.x].wasTyped = true;
+                setCsr({x: csrRef.current.x + 1, y: csrRef.current.y });
             }   
             return;
-        } else if (event.key === "Enter" && this.state.cursor.y < this.state.lines.length - 1 && 
-                   this.state.cursor.x === this.state.lines[this.state.cursor.y].chars.length) {
-            this.setState({ cursor: { x: 0, y: this.state.cursor.y + 1 }});
+        } else if (event.key === "Enter" && csrRef.current.y < lnsRef.current.length - 1 && 
+                    csrRef.current.x === lnsRef.current[csrRef.current.y].chars.length) {
+            setCsr({ x: 0, y: csrRef.current.y + 1 });
             return;
         }  
     }
 
-    render() {
-        return (
-            <>
-                <div className='code-area-header-wrapper'>
-                    <button className='reset-button' onClick={() => this.resetState()}>
-                        <BiReset size='24px' color='#B9B9B9' />
-                    </button>
-                </div>
-                <div className='code-area-wrapper'>
-                    {
-                        this.state.lines?.map((line: CodeLine, lineNumber: number) => {
-                            return (
-                                <div className='line' key={lineNumber}>
-                                    <div className='line-number-wrapper'>
-                                        <span className='line-number'>
-                                            { lineNumber + 1 }
-                                        </span>
-                                    </div>
-                                    <div className='line-code-wrapper'>
-                                        {    
-                                            this.state.lines[lineNumber].chars.map((char: CodeCharacter, charIndex: number) => {
-                                                return (
-                                                    <div style={{ display: 'flex' }} key={`${lineNumber}:${charIndex}`}>
-                                                        <div style={{ display: 'flex'}}>
-                                                            <span className='line-code' style={{ opacity: `${char.wasTyped ? '1' : '0.5'}` }}>
-                                                                { char.c }
-                                                            </span>
-                                                            { this.state.cursor.x === charIndex && this.state.cursor.y === lineNumber ? (
-                                                                <span className='cursor'></span>
-                                                            ) : null }
-                                                        </div>
-                                                        { this.state.cursor.x === this.state.lines[lineNumber].chars.length && 
-                                                            charIndex + 1 === this.state.lines[lineNumber].chars.length &&
-                                                            this.state.cursor.y === lineNumber ? (
-                                                            <span className='cursor' style={{ position: 'relative' }}></span>
+
+    return (
+        <>
+            <div className='code-area-wrapper'>
+                {
+                    lines?.map((line: CodeLine, lineNumber: number) => {
+                        return (
+                            <div className='line' key={lineNumber}>
+                                <div className='line-number-wrapper' style={{ paddingTop: `${lineNumber ? 0 : '5px'}` }}>
+                                    <span className='line-number'>
+                                        { lineNumber + 1 }
+                                    </span>
+                                </div>
+                                <div className='line-code-wrapper' style={{ paddingTop: `${lineNumber ? 0 : '5px'}` }}>
+                                    {    
+                                        lines[lineNumber].chars.map((char: CodeCharacter, charIndex: number) => {
+                                            return (
+                                                <div style={{ display: 'flex' }} key={`${lineNumber}:${charIndex}`}>
+                                                    <div style={{ display: 'flex'}}>
+                                                        <span className='line-code' style={{ opacity: `${char.wasTyped ? '1' : '0.5'}` }}>
+                                                            { char.c }
+                                                        </span>
+                                                        { csr.x === charIndex && csr.y === lineNumber ? (
+                                                            <span className='cursor'></span>
                                                         ) : null }
                                                     </div>
-                                                )
-                                            })
-                                        }
-                                        { this.state.lines[lineNumber].chars.length === 0 && this.state.cursor.y === lineNumber ? (
-                                            <span className='cursor' style={{ position: 'relative' }}></span>
-                                        ) : null }
-                                    </div>
+                                                    { csr.x === lines[lineNumber].chars.length && 
+                                                        charIndex + 1 === lines[lineNumber].chars.length &&
+                                                        csr.y === lineNumber ? (
+                                                        <span className='cursor' style={{ position: 'relative' }}></span>
+                                                    ) : null }
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                    { lines[lineNumber].chars.length === 0 && csr.y === lineNumber ? (
+                                        <span className='cursor' style={{ position: 'relative' }}></span>
+                                    ) : null }
                                 </div>
-                            )
-                        })
-                    }
-                </div>
-            </>
-        )
-    }
+                            </div>
+                        )
+                    })
+                }
+            </div>
+            <button onClick={() => console.log(csr)}>
+                View
+            </button>
+        </>
+    )
 }
 
 export default CodeArea;
