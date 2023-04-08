@@ -92,9 +92,6 @@ const CodeArea: React.FC<{}> = (props: Props): JSX.Element => {
                     })
                 }
             </div>
-            <button onClick={() => console.log(csr)}>
-                View
-            </button>
         </>
     )
 }
