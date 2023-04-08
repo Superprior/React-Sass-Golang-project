@@ -1,2 +1,5 @@
 **/node_modules/
 /typus_frontend/package-lock.json
+**/*.env
+**/*.exe
+**/*.sum
