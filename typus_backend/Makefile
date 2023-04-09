@@ -12,7 +12,7 @@ source .env
 ## build: Build the executable file
 .PHONY: build
 build:
-	go build -v ./cmd/apiserver
+	go build -v ./cmd/api
 
 
 ## test: Run all tests (tests are not added yet)

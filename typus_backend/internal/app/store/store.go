@@ -8,8 +8,9 @@ import (
 )
 
 type Store struct {
-	config *Config
-	db     *sql.DB
+	config             *Config
+	db                 *sql.DB
+	languageRepository *LanguageRepository
 }
 
 func New(config *Config) *Store {
@@ -38,4 +39,16 @@ func (s *Store) Open() error {
 
 func (s *Store) Close() {
 	s.db.Close()
+}
+
+func (s *Store) Language() *LanguageRepository {
+	if s.languageRepository != nil {
+		return s.languageRepository
+	}
+
+	s.languageRepository = &LanguageRepository{
+		store: s,
+	}
+
+	return s.languageRepository
 }
