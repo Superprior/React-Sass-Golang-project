@@ -38,6 +38,7 @@ func (s *APIserver) Start() error {
 func (s *APIserver) configureRouter() {
 	s.router.HandleFunc("/api", s.handleApiList())
 	s.router.HandleFunc("/api/languages", s.handleLanguagesList()).Methods("GET")
+	s.router.HandleFunc("/api/samples", s.handleSamplesList()).Methods("GET")
 }
 
 func (s *APIserver) configureStore() error {
@@ -78,6 +79,37 @@ func (s *APIserver) handleLanguagesList() http.HandlerFunc {
 			w.Write(resp)
 
 			fmt.Println("API REQUEST: /api/languages [500 INTERNAL SERVER ERROR]")
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write(jsonResp)
+		fmt.Println("API REQUEST: /api/languages [200 OK]")
+	}
+}
+
+func (s *APIserver) handleSamplesList() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		data, err := s.store.Sample().GetList()
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			resp, _ := json.Marshal(map[string]string{"error": "could not get query the request"})
+			w.Write(resp)
+
+			fmt.Println("API REQUEST: /api/samples [500 INTERNAL SERVER ERROR]")
+			return
+		}
+
+		jsonResp, err := json.Marshal(data)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			resp, _ := json.Marshal(map[string]string{"error": "could not encode json"})
+			w.Write(resp)
+
+			fmt.Println("API REQUEST: /api/samples [500 INTERNAL SERVER ERROR]")
 			return
 		}
 

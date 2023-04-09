@@ -11,6 +11,7 @@ type Store struct {
 	config             *Config
 	db                 *sql.DB
 	languageRepository *LanguageRepository
+	sampleRepository   *SampleRepository
 }
 
 func New(config *Config) *Store {
@@ -51,4 +52,16 @@ func (s *Store) Language() *LanguageRepository {
 	}
 
 	return s.languageRepository
+}
+
+func (s *Store) Sample() *SampleRepository {
+	if s.sampleRepository != nil {
+		return s.sampleRepository
+	}
+
+	s.sampleRepository = &SampleRepository{
+		store: s,
+	}
+
+	return s.sampleRepository
 }
