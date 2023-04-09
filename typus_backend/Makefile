@@ -36,17 +36,17 @@ test:
 	-verbose up
 
 
-## migrate_up: Run all the down migration files that were not applied to the database yet.
+## migrate_down: Run all the down migration files that were not applied to the database yet.
 .PHONY: migrate_down
 	migrate -path migrations -database \
 	"postgres://$(POSTGRES_HOST)/$(POSTGRES_NAME)?sslmode=$(POSTGRES_SSLMODE)&user=$(POSTGRES_USER)&password=$(POSTGRES_PASSWORD)" \
 	-verbose down
 
 
-## makemigration: Create up and down migration files in /migrations directory.
-## 				  Migration name needs to be passed in args.
+## makemigration: Apply a certain migration version.
+##				  Version needs to be passed in args.
 ## Usage: 
-## 		make makemigration name="..."
+## 		make migrate_fix version="..."
 .PHONY: migrate_fix
 	migrate -path migrations -database \
 	"postgres://$(POSTGRES_HOST)/$(POSTGRES_NAME)?sslmode=$(POSTGRES_SSLMODE)&user=$(POSTGRES_USER)&password=$(POSTGRES_PASSWORD)" \
