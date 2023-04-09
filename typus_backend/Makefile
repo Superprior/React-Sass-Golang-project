@@ -36,7 +36,7 @@ test:
 	-verbose up
 
 
-## migrate_down: Run all the down migration files that were not applied to the database yet.
+## migrate_down: Run the latest down migration file. 
 .PHONY: migrate_down
 	migrate -path migrations -database \
 	"postgres://$(POSTGRES_HOST)/$(POSTGRES_NAME)?sslmode=$(POSTGRES_SSLMODE)&user=$(POSTGRES_USER)&password=$(POSTGRES_PASSWORD)" \
