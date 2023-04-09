@@ -30,3 +30,26 @@ func (r *LanguageRepository) FindBySlug(slug string) (*model.Language, error) {
 	}
 	return l, nil
 }
+
+func (r *LanguageRepository) GetList() (*[]model.Language, error) {
+	rows, err := r.store.db.Query("SELECT * FROM programming_languages;")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var langs []model.Language
+
+	for rows.Next() {
+		var lang model.Language
+		if err := rows.Scan(&lang.ID, &lang.Slug, &lang.Title); err != nil {
+			return &langs, nil
+		}
+		langs = append(langs, lang)
+	}
+
+	if err = rows.Err(); err != nil {
+		return &langs, err
+	}
+	return &langs, nil
+}
