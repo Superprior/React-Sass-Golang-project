@@ -66,7 +66,7 @@ func (s *APIserver) handleLanguagesList() http.HandlerFunc {
 			resp, _ := json.Marshal(map[string]string{"error": "could not get query the request"})
 			w.Write(resp)
 
-			fmt.Println("API REQUEST: /api/languages [INTERNAL SERVER ERROR]")
+			fmt.Println("API REQUEST: /api/languages [500 INTERNAL SERVER ERROR]")
 			return
 		}
 
@@ -77,12 +77,12 @@ func (s *APIserver) handleLanguagesList() http.HandlerFunc {
 			resp, _ := json.Marshal(map[string]string{"error": "could not encode json"})
 			w.Write(resp)
 
-			fmt.Println("API REQUEST: /api/languages [INTERNAL SERVER ERROR]")
+			fmt.Println("API REQUEST: /api/languages [500 INTERNAL SERVER ERROR]")
 			return
 		}
 
 		w.WriteHeader(http.StatusOK)
 		w.Write(jsonResp)
-		fmt.Println("API REQUEST: /api/languages [OK]")
+		fmt.Println("API REQUEST: /api/languages [200 OK]")
 	}
 }

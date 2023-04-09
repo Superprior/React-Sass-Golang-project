@@ -2,6 +2,6 @@ CREATE TYPE programming_language AS ENUM ('TypeScript', 'Python', 'Go', 'Rust', 
 
 CREATE TABLE programming_languages (
     id BIGSERIAL NOT NULL PRIMARY KEY,
-    slug VARCHAR(20) NOT NULL,
+    slug VARCHAR(20) NOT NULL UNIQUE,
     title programming_language
 );
