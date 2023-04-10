@@ -8,7 +8,7 @@ import useCodeSample from '../hooks/useCodeSample';
 interface Props {}
 
 const CodeArea: React.FC<{}> = (props: Props): JSX.Element => {
-    const codeSample = useCodeSample({isTest: true});
+    const { status, codeSample, error } = useCodeSample({ exampleId: '2' });
     const [lines, _setLines] = useState<CodeLine[]>([]);
     const [csr, _setCsr] = useState<Cursor>({ x: 0, y: 0});
 
@@ -25,7 +25,9 @@ const CodeArea: React.FC<{}> = (props: Props): JSX.Element => {
     }
 
     useEffect(() => {
-        setLines(codeSample);
+        if (status === 'success') {
+            setLines(codeSample);
+        }
         document.addEventListener("keydown", handleKeyboard);
 
         return () => {

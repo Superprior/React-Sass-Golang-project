@@ -36,3 +36,14 @@ export interface Cursor {
     x: number;
     y: number;
 }
+
+export interface CodeSample {
+    id: number;
+    title: string;
+    content: string;
+    langSlug: string;
+}
+
+export interface CodeSamples {
+    samples: CodeSample[];
+}

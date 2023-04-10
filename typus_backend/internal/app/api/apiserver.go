@@ -38,7 +38,7 @@ func (s *APIserver) Start() error {
 func (s *APIserver) configureRouter() {
 	s.router.HandleFunc("/api", s.handleApiList())
 	s.router.HandleFunc("/api/languages", s.handleLanguagesList()).Methods("GET")
-	s.router.HandleFunc("/api/samples", s.handleSamplesList()).Methods("GET")
+	s.router.HandleFunc("/api/samples", s.handleSamplesList()).Methods("GET", "OPTIONS")
 }
 
 func (s *APIserver) configureStore() error {
@@ -49,6 +49,13 @@ func (s *APIserver) configureStore() error {
 
 	s.store = st
 	return nil
+}
+
+func configureHeaders(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+	(*w).Header().Set("Access-Control-Allow-Headers", "*")
+	(*w).Header().Set("Content-Type", "application/json; charset=UTF-8")
 }
 
 func (s *APIserver) handleApiList() http.HandlerFunc {
@@ -90,7 +97,8 @@ func (s *APIserver) handleLanguagesList() http.HandlerFunc {
 
 func (s *APIserver) handleSamplesList() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
+		configureHeaders(&w)
+
 		data, err := s.store.Sample().GetList()
 
 		if err != nil {
