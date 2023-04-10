@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { CodeLine, CodeSamples } from '../interfaces';
-
+import { CodeLine, CodeCharacter, CodeSamples } from '../interfaces';
 
 interface Props {
     /**
@@ -17,7 +16,7 @@ type State =
     | { status: 'idle', codeSample: null, error: null }
     | { status: 'loading', codeSample: null, error: null }
     | { status: 'success', codeSample: CodeLine[], error: null }
-    | { status: 'error', codeSample: null, error: Error }
+    | { status: 'error', codeSample: null, error: Error | string }
 
 
 
@@ -40,10 +39,27 @@ function useCodeSample(props: Props): State {
                 if (responseData.status === 200) {
                     const samples = await responseData.json();
                     if (samples.length > 0) {
-                        const sample = samples[0];
-                        console.log(sample);
+                        const sampleContent: string[] = samples[0].Content.split("\\n");
+                        for (let i = 0; i < sampleContent.length; i++) {
+                            sampleContent[i] = sampleContent[i].replace(/\\t/g, "    ");
+                        }
+
+                        const lines: CodeLine[] = []
+
+                        for (let i = 0; i < sampleContent.length; i++) {
+                            const line: CodeLine = { chars: [] }
+                            for (let j = 0; j < sampleContent[i].length; j++) {
+                                const char: CodeCharacter = { c: sampleContent[i][j], wasTyped: false, isHighlighted: false };
+                                line.chars.push(char);
+                            }
+                            lines.push(line);
+                        }
+                        setState({ status: 'success', codeSample: lines, error: null })
+                    } else {
+                        setState({ status: 'error', codeSample: null, error: "" })
                     }
-                    setState({ status: 'success', codeSample: [], error: null })
+                } else {
+                    setState({ status: 'error', codeSample: null, error: "Could not fulfill the request" })
                 }
             } catch (error: any) {
                 setState({ status: 'error', codeSample: null, error: error })
