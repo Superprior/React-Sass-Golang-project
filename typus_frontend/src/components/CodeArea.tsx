@@ -59,7 +59,7 @@ const CodeArea: React.FC<{}> = (props: Props): JSX.Element => {
                     lines?.map((line: CodeLine, lineNumber: number) => {
                         return (
                             <div className='line' key={lineNumber}>
-                                <div className='line-number-wrapper' style={{ paddingTop: `${lineNumber ? 0 : '5px'}` }}>
+                                <div className='line-number-wrapper' style={{ paddingTop: `${lineNumber ? 0 : '10px'}` }}>
                                     <span className='line-number'>
                                         { lineNumber + 1 }
                                     </span>
@@ -67,7 +67,7 @@ const CodeArea: React.FC<{}> = (props: Props): JSX.Element => {
                                 { error ? (
                                     <h1>An error ocurred: { error }</h1>
                                 ) : (
-                                    <div className='line-code-wrapper' style={{ paddingTop: `${lineNumber ? 0 : '5px'}` }}>
+                                    <div className='line-code-wrapper' style={{ paddingTop: `${lineNumber ? 0 : '10px'}` }}>
                                         {    
                                             lines[lineNumber].chars.map((char: CodeCharacter, charIndex: number) => {
                                                 return (
@@ -98,6 +98,10 @@ const CodeArea: React.FC<{}> = (props: Props): JSX.Element => {
                         )
                     })
                 }
+                <div className='filler'>
+                    <div className='filler-line-numbers'></div>
+                    <div className='filler-code'></div>
+                </div>
             </div>
         </>
     )

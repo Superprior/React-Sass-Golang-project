@@ -5,7 +5,20 @@ $sidebars-color: #202020
     position: relative
     background-color: #1A1A1A
     line-height: 1.5
-    display: block
+    display: flex
+    flex-direction: column
+    height: calc(100vh - 40px)
+
+.filler
+    flex-grow: 1
+    display: inline-block
+    position: relative
+
+.filler-line-numbers
+    background-color: $sidebars-color
+    width: 60px
+    height: 100%
+    position: absolute
 
 .line
     font-size: 1rem
