@@ -26,7 +26,7 @@ type State =
     | { status: 'idle', codeSample: null, error: null }
     | { status: 'loading', codeSample: null, error: null }
     | { status: 'success', codeSample: CodeLine[], error: null }
-    | { status: 'error', codeSample: null, error: Error | string }
+    | { status: 'error', codeSample: null, error: string }
 
 
 /**
@@ -73,13 +73,13 @@ function useCodeSample(props: Props): State {
                         }
                         setState({ status: 'success', codeSample: lines, error: null })
                     } else {
-                        setState({ status: 'error', codeSample: null, error: "" })
+                        setState({ status: 'error', codeSample: null, error: "Empty response from the server" })
                     }
                 } else {
-                    setState({ status: 'error', codeSample: null, error: "Could not fulfill the request" })
+                    setState({ status: 'error', codeSample: null, error: `Could not fulfill the request, code ${responseData.status}` })
                 }
-            } catch (error: any) {
-                setState({ status: 'error', codeSample: null, error: error })
+            } catch (error) {
+                setState({ status: 'error', codeSample: null, error: "Could not fetch data from API" })
             }
         }
 

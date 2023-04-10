@@ -7,6 +7,7 @@ import useCodeSample from '../hooks/useCodeSample';
 
 interface Props {}
 
+
 const CodeArea: React.FC<{}> = (props: Props): JSX.Element => {
     const { status, codeSample, error } = useCodeSample({ exampleId: '2' });
     const [lines, _setLines] = useState<CodeLine[]>([]);
@@ -63,32 +64,36 @@ const CodeArea: React.FC<{}> = (props: Props): JSX.Element => {
                                         { lineNumber + 1 }
                                     </span>
                                 </div>
-                                <div className='line-code-wrapper' style={{ paddingTop: `${lineNumber ? 0 : '5px'}` }}>
-                                    {    
-                                        lines[lineNumber].chars.map((char: CodeCharacter, charIndex: number) => {
-                                            return (
-                                                <div style={{ display: 'flex' }} key={`${lineNumber}:${charIndex}`}>
-                                                    <div style={{ display: 'flex'}}>
-                                                        <span className='line-code' style={{ opacity: `${char.wasTyped ? '1' : '0.5'}` }}>
-                                                            { char.c }
-                                                        </span>
-                                                        { csr.x === charIndex && csr.y === lineNumber ? (
-                                                            <span className='cursor'></span>
+                                { error ? (
+                                    <h1>An error ocurred: { error }</h1>
+                                ) : (
+                                    <div className='line-code-wrapper' style={{ paddingTop: `${lineNumber ? 0 : '5px'}` }}>
+                                        {    
+                                            lines[lineNumber].chars.map((char: CodeCharacter, charIndex: number) => {
+                                                return (
+                                                    <div style={{ display: 'flex' }} key={`${lineNumber}:${charIndex}`}>
+                                                        <div style={{ display: 'flex'}}>
+                                                            <span className='line-code' style={{ opacity: `${char.wasTyped ? '1' : '0.5'}` }}>
+                                                                { char.c }
+                                                            </span>
+                                                            { csr.x === charIndex && csr.y === lineNumber ? (
+                                                                <span className='cursor'></span>
+                                                            ) : null }
+                                                        </div>
+                                                        { csr.x === lines[lineNumber].chars.length && 
+                                                            charIndex + 1 === lines[lineNumber].chars.length &&
+                                                            csr.y === lineNumber ? (
+                                                            <span className='cursor' style={{ position: 'relative' }}></span>
                                                         ) : null }
                                                     </div>
-                                                    { csr.x === lines[lineNumber].chars.length && 
-                                                        charIndex + 1 === lines[lineNumber].chars.length &&
-                                                        csr.y === lineNumber ? (
-                                                        <span className='cursor' style={{ position: 'relative' }}></span>
-                                                    ) : null }
-                                                </div>
-                                            )
-                                        })
-                                    }
-                                    { lines[lineNumber].chars.length === 0 && csr.y === lineNumber ? (
-                                        <span className='cursor' style={{ position: 'relative' }}></span>
-                                    ) : null }
-                                </div>
+                                                )
+                                            })
+                                        }
+                                        { lines[lineNumber].chars.length === 0 && csr.y === lineNumber ? (
+                                            <span className='cursor' style={{ position: 'relative' }}></span>
+                                        ) : null }
+                                    </div>
+                                )}
                             </div>
                         )
                     })
