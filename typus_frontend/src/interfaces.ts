@@ -2,10 +2,11 @@ export interface CodeCharacter {
     /**
      * This interface represents a single character of code.
      * 
-     * @param {string}  c             - The character itself.
-     * @param {boolean} wasTyped      - Represents if the character was already typed by a user. Should be false by default.
-     * @param {boolean} isHighlighted - Determines if the character is highlighted. 
-     *                                  This parameter is used for marking a character if it was typed incorrectly.
+     * @property {string}  c             - The character itself.
+     * @property {boolean} wasTyped      - Represents if the character was already typed by a user. Should be false by default.
+     * @property {boolean} isHighlighted - Determines if the character is highlighted. 
+     *                                     This property is used for marking a character if it was typed incorrectly.
+     * @interface
      */
 
     c: string;
@@ -17,8 +18,9 @@ export interface CodeLine {
     /**
      * This interface represents a line of code.
      * 
-     * @param {CodeCharacter[]} chars - Stores an array of characters to type.
+     * @property {CodeCharacter[]} chars - Stores an array of characters to type.
      * 
+     * @interface
      */
 
     chars: CodeCharacter[];
@@ -28,22 +30,12 @@ export interface Cursor {
     /**
      * This interface represents a cursor which is used in a code field.
      * 
-     * @param {number} x - Coordinate by the X-axis
-     * @param {number} y - Coordinate by the Y-axis
+     * @property {number} x - Coordinate by the X-axis
+     * @property {number} y - Coordinate by the Y-axis
      * 
+     * @interface
      */
 
     x: number;
     y: number;
-}
-
-export interface CodeSample {
-    id: number;
-    title: string;
-    content: string;
-    langSlug: string;
-}
-
-export interface CodeSamples {
-    samples: CodeSample[];
 }

@@ -1,17 +1,27 @@
 import { useState, useEffect } from 'react'
-import { CodeLine, CodeCharacter, CodeSamples } from '../interfaces';
+import { CodeLine, CodeCharacter } from '../interfaces';
 
 interface Props {
     /**
      * Parameters of the useCodeSample custom hook.
      * 
-     * @param {string}  exampleId - A unique id of the example the user wants to retrieve
-     * @param {boolean} isTest    - Determines if the test sample is needed [dev purposes]
+     * @property {string} exampleId - A unique id of the example the user wants to retrieve
      * 
+     * @interface
      */
+
     exampleId: string;
 }
 
+/**
+ * The state of the useCodeSample custom React hook.
+ * 
+ * @property {string} status                - The current state of data fetching/parsing process.
+ * @property {CodeLine[] | null} codeSample - Data that was already fetched and parsed.
+ * @property {Error | string} error         - Storing possible errors.
+ * 
+ * @typedef {Object} State
+ */
 type State =
     | { status: 'idle', codeSample: null, error: null }
     | { status: 'loading', codeSample: null, error: null }
@@ -19,7 +29,14 @@ type State =
     | { status: 'error', codeSample: null, error: Error | string }
 
 
-
+/**
+ * useCodeSample is a custom React hook forconvenient data retrieving from the samples API.
+ * 
+ * @param {Props} props - The hook props.
+ * @returns {State} - An object containing the state of a request. 
+ * 
+ * @function
+ */
 function useCodeSample(props: Props): State {
     const [state, setState] = useState<State>({ status: 'idle', codeSample: null, error: null });
 
