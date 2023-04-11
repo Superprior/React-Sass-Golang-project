@@ -2,6 +2,7 @@ package store
 
 import (
 	"backend/internal/app/model"
+	"backend/pkg/parsers"
 	"log"
 )
 
@@ -25,9 +26,12 @@ func (r *SampleRepository) GetList() (*[]model.Sample, error) {
 
 	for rows.Next() {
 		var sample model.Sample
-		if err := rows.Scan(&sample.ID, &sample.Title, &sample.Content, &sample.LangSlug); err != nil {
+		var codeLinesStr string
+		if err := rows.Scan(&sample.ID, &sample.Title, &codeLinesStr, &sample.LangSlug); err != nil {
 			return &samples, nil
 		}
+
+		sample.Content = parsers.ParsePostgresArray(codeLinesStr)
 		samples = append(samples, sample)
 	}
 

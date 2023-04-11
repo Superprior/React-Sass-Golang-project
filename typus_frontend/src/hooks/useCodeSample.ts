@@ -56,10 +56,7 @@ function useCodeSample(props: Props): State {
                 if (responseData.status === 200) {
                     const samples = await responseData.json();
                     if (samples.length > 0) {
-                        const sampleContent: string[] = samples[0].Content.split("\\n");
-                        for (let i = 0; i < sampleContent.length; i++) {
-                            sampleContent[i] = sampleContent[i].replace(/\\t/g, "    ");
-                        }
+                        const sampleContent: string[] = samples[0].Content
 
                         const lines: CodeLine[] = []
 
