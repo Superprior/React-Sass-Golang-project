@@ -4,8 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"os"
 	"strconv"
+
+	"github.com/joho/godotenv"
 
 	"github.com/gorilla/mux"
 )
@@ -20,6 +24,42 @@ func configureHeaders(w *http.ResponseWriter) {
 func (s *APIserver) handleApiList() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, "API root")
+	}
+}
+
+func (s *APIserver) handleAdminAuth() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		err := godotenv.Load(".env")
+		if err != nil {
+			log.Fatal("Failed to load .env file")
+		}
+
+		adminPassword := os.Getenv("ADMIN_PASSWORD")
+		providedPassword := r.Header.Get("Authorization")
+
+		if providedPassword == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			resp, _ := json.Marshal(map[string]string{"access": "PASSWORD NOT PROVIDED"})
+			w.Write(resp)
+
+			fmt.Println("API REQUEST: /api/auth_admin [400 BAD REQUEST]")
+		} else {
+			if adminPassword == providedPassword {
+				w.WriteHeader(http.StatusOK)
+				resp, _ := json.Marshal(map[string]string{"access": "OK"})
+				w.Write(resp)
+
+				fmt.Println("API REQUEST: /api/auth_admin [200 OK]")
+			} else {
+				w.WriteHeader(http.StatusUnauthorized)
+				resp, _ := json.Marshal(map[string]string{"access": "WRONG PASSWORD"})
+				w.Write(resp)
+
+				fmt.Println("API REQUEST: /api/auth_admin [401 UNAUTHORIZED]")
+			}
+		}
 	}
 }
 

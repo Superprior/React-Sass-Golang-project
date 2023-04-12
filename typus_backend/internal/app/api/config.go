@@ -41,6 +41,7 @@ func (s *APIserver) configureRouter() {
 	s.router.HandleFunc("/api/languages", s.handleLanguagesList()).Methods("GET", "OPTIONS")
 	s.router.HandleFunc("/api/samples", s.handleSamplesList()).Methods("GET", "OPTIONS")
 	s.router.HandleFunc("/api/samples/{id}", s.handleSampleInstance()).Methods("GET", "OPTIONS")
+	s.router.HandleFunc("/api/auth_admin", s.handleAdminAuth()).Methods("GET", "OPTIONS")
 }
 
 func (s *APIserver) configureStore() error {
