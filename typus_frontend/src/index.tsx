@@ -2,7 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import IndexPage from './pages/IndexPage';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import SamplesPage from './pages/SamplesPage';
+import SamplesListPage from './pages/SamplesListPage';
+import SamplePage from './pages/SamplePage';
 
 
 const router = createBrowserRouter([
@@ -12,7 +13,11 @@ const router = createBrowserRouter([
   },
   {
     path: '/samples',
-    element: <SamplesPage />
+    element: <SamplesListPage />
+  },
+  {
+    path: '/samples/:id',
+    element: <SamplePage />
   }
 ])
 

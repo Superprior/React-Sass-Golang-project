@@ -10,8 +10,12 @@ const IndexPage: React.FC<{}> = (props: Props): JSX.Element => {
 
     return (
         <>
-            <CodeAreaHeader />
-            <CodeArea sampleId='1' />
+            <h1>Index Page</h1>
+            <button 
+                onClick={() => window.location.replace(`${process.env.REACT_APP_PROTOCOL}://${process.env.REACT_APP_HOSTNAME}:3000/samples/`)}
+            >
+                Code samples list
+            </button>
         </>
     );
 }
