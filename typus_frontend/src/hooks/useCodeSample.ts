@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { CodeLine, CodeCharacter } from '../interfaces';
+import { FetchState } from '../interfaces';
+
 
 interface Props {
     /**
@@ -14,22 +16,6 @@ interface Props {
 }
 
 /**
- * The state of the useCodeSample custom React hook.
- * 
- * @property {string} status                - The current state of data fetching/parsing process.
- * @property {Codeline[] | null} codeSample - Data that was already fetched and parsed.
- * @property {Error | string} error         - Storing possible errors.
- * 
- * @typedef {Object} State
- */
-type State =
-    | { status: 'idle', codeSample: null, error: null }
-    | { status: 'loading', codeSample: null, error: null }
-    | { status: 'success', codeSample: CodeLine[], error: null }
-    | { status: 'error', codeSample: null, error: string }
-
-
-/**
  * useCodeSample is a custom React hook forconvenient data retrieving from the samples API.
  * 
  * @param {Props} props - The hook props.
@@ -37,11 +23,11 @@ type State =
  * 
  * @function
  */
-function useCodeSample(props: Props): State {
-    const [state, setState] = useState<State>({ status: 'idle', codeSample: null, error: null });
+function useCodeSample(props: Props): FetchState<CodeLine[]> {
+    const [state, setState] = useState<FetchState<CodeLine[]>>({ status: 'idle', data: null, error: null });
 
     useEffect(() => {
-        setState({ status: 'loading', codeSample: null, error: null });
+        setState({ status: 'loading', data: null, error: null });
 
         const fetchParseData = async () => {
             try {
@@ -53,6 +39,7 @@ function useCodeSample(props: Props): State {
                         'Content-Type': 'application/json',
                     }
                 });
+                
                 if (responseData.status === 200) {
                     const sample = await responseData.json();
                     const lines: CodeLine[] = []
@@ -65,12 +52,12 @@ function useCodeSample(props: Props): State {
                         }
                         lines.push(line);
                     }
-                    setState({ status: 'success', codeSample: lines, error: null })
+                    setState({ status: 'success', data: lines, error: null })
                 } else {
-                    setState({ status: 'error', codeSample: null, error: `Could not fulfill the request, code ${responseData.status}` })
+                    setState({ status: 'error', data: null, error: `Could not fulfill the request, code ${responseData.status}` })
                 }
             } catch (error) {
-                setState({ status: 'error', codeSample: null, error: "Could not fetch data from API" })
+                setState({ status: 'error', data: null, error: "Could not fetch data from API" })
             }
         }
 

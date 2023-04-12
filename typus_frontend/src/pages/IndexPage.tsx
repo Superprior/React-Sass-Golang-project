@@ -1,6 +1,6 @@
 import React from 'react'
 import CodeArea from '../components/CodeArea'
-import Header from '../components/Header'
+import CodeAreaHeader from '../components/CodeAreaHeader'
 import './styles/index.sass'
 
 
@@ -10,7 +10,7 @@ const IndexPage: React.FC<{}> = (props: Props): JSX.Element => {
 
     return (
         <>
-            <Header />
+            <CodeAreaHeader />
             <CodeArea sampleId='1' />
         </>
     );

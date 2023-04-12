@@ -5,7 +5,7 @@ import './styles/code-area-header.sass'
 
 interface Props {}
 
-const Header: React.FC<{}> = (props: Props): JSX.Element => {
+const CodeAreaHeader: React.FC<{}> = (props: Props): JSX.Element => {
     return (
         <div className='code-area-header-wrapper'>
             <button className='reset-button' onClick={() => {}}>
@@ -15,4 +15,4 @@ const Header: React.FC<{}> = (props: Props): JSX.Element => {
     );
 }
 
-export default Header;
+export default CodeAreaHeader;

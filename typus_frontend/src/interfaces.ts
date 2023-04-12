@@ -39,3 +39,34 @@ export interface Cursor {
     x: number;
     y: number;
 }
+
+export interface SampleCard {
+    /**
+     * This interface represents a code sample data which is displayed in samples page.
+     * 
+     * @property {string} sampleId - ID of the sample.
+     * @property {string} title    - Name of the sample.
+     * @property {string} langSlug - Short name of the programming language that sample is written in.
+     *                               Essentialy it is the file extension, such as .py for Python or .ts for TypeScript
+     * @interface
+     */
+
+    sampleId: string;
+    title: string;
+    langSlug: string;
+}
+
+/**
+ * The state of a custom React hook that fetches data from API.
+ * 
+ * @property {string} status        - The current state of data fetching/parsing process.
+ * @property {T | null} data        - Data that was already fetched and parsed.
+ * @property {string | null} error  - Storing possible errors.
+ * 
+ * @typedef {Object} State
+ */
+export type FetchState<T> =
+    | { status: 'idle', data: null, error: null }
+    | { status: 'loading', data: null, error: null }
+    | { status: 'success', data: T, error: null }
+    | { status: 'error', data: null, error: string }

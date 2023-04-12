@@ -11,7 +11,7 @@ interface Props {
 
 
 function CodeArea(props: Props): JSX.Element {
-    const { status, codeSample, error } = useCodeSample({ sampleId: props.sampleId });
+    const { status, data, error } = useCodeSample({ sampleId: props.sampleId });
     const [lines, _setLines] = useState<CodeLine[]>([]);
     const [csr, _setCsr] = useState<Cursor>({ x: 0, y: 0});
 
@@ -29,14 +29,14 @@ function CodeArea(props: Props): JSX.Element {
 
     useEffect(() => {
         if (status === 'success') {
-            setLines(codeSample);
+            setLines(data);
         }
         document.addEventListener("keydown", handleKeyboard);
 
         return () => {
             document.removeEventListener("keydown", handleKeyboard);
         }
-    }, [codeSample]);
+    }, [data]);
 
     const handleKeyboard = (event: KeyboardEvent): void => {
         if (isCodeSymbol(event.key) && csrRef.current.x < lnsRef.current[csrRef.current.y].chars.length) {
