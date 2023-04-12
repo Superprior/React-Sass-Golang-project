@@ -17,7 +17,7 @@ interface Props {
  * The state of the useCodeSample custom React hook.
  * 
  * @property {string} status                - The current state of data fetching/parsing process.
- * @property {CodeLine[] | null} codeSample - Data that was already fetched and parsed.
+ * @property {Codeline[] | null} codeSample - Data that was already fetched and parsed.
  * @property {Error | string} error         - Storing possible errors.
  * 
  * @typedef {Object} State

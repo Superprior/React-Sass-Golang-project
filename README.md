@@ -9,7 +9,7 @@ Typus is a website created for practising quick code typing. No third-party fron
 ## Implemented features
 
 - Typing one hardcoded code template (choosing different code samples will be implemented soon)
-- Code highlighting on progress
+- Code highlighting in progress
 
 ## Ingredients
 

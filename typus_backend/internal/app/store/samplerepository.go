@@ -3,6 +3,7 @@ package store
 import (
 	"backend/internal/app/model"
 	"backend/pkg/parsers"
+	"fmt"
 	"log"
 )
 
@@ -39,4 +40,21 @@ func (r *SampleRepository) GetList() (*[]model.Sample, error) {
 		return &samples, err
 	}
 	return &samples, nil
+}
+
+func (r *SampleRepository) GetInstance(id int) (*model.Sample, error) {
+	var (
+		sample       model.Sample
+		codeLinesStr string
+	)
+
+	err := r.store.db.QueryRow(fmt.Sprintf("SELECT * FROM code_samples WHERE id=%d;", id)).Scan(
+		&sample.ID, &sample.Title, &codeLinesStr, &sample.LangSlug)
+
+	sample.Content = parsers.ParsePostgresArray(codeLinesStr)
+
+	if err != nil {
+		return nil, err
+	}
+	return &sample, nil
 }

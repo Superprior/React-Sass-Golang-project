@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -37,8 +38,9 @@ func (s *APIserver) Start() error {
 
 func (s *APIserver) configureRouter() {
 	s.router.HandleFunc("/api", s.handleApiList())
-	s.router.HandleFunc("/api/languages", s.handleLanguagesList()).Methods("GET")
+	s.router.HandleFunc("/api/languages", s.handleLanguagesList()).Methods("GET", "OPTIONS")
 	s.router.HandleFunc("/api/samples", s.handleSamplesList()).Methods("GET", "OPTIONS")
+	s.router.HandleFunc("/api/samples/{id}", s.handleSampleInstance()).Methods("GET", "OPTIONS")
 }
 
 func (s *APIserver) configureStore() error {
@@ -118,6 +120,50 @@ func (s *APIserver) handleSamplesList() http.HandlerFunc {
 			w.Write(resp)
 
 			fmt.Println("API REQUEST: /api/samples [500 INTERNAL SERVER ERROR]")
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write(jsonResp)
+		fmt.Println("API REQUEST: /api/languages [200 OK]")
+	}
+}
+
+func (s *APIserver) handleSampleInstance() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		configureHeaders(&w)
+
+		vars := mux.Vars(r)
+		strKey := vars["id"]
+		intKey, err := strconv.Atoi(strKey)
+
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			resp, _ := json.Marshal(map[string]string{"error": "invalid ID type"})
+			w.Write(resp)
+
+			fmt.Printf("API REQUEST: /api/samples/%s [400 BAD REQUEST]\n", strKey)
+		}
+		fmt.Printf("%T %d\n", intKey, intKey)
+
+		data, err := s.store.Sample().GetInstance(intKey)
+
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			resp, _ := json.Marshal(map[string]string{"error": "invalid ID"})
+			w.Write(resp)
+
+			fmt.Printf("API REQUEST: /api/samples/%d [400 BAD REQUEST]\n", intKey)
+		}
+
+		jsonResp, err := json.Marshal(data)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			resp, _ := json.Marshal(map[string]string{"error": "could not encode json"})
+			w.Write(resp)
+
+			fmt.Printf("API REQUEST: /api/samples/%d [500 INTERNAL SERVER ERROR]\n", intKey)
 			return
 		}
 

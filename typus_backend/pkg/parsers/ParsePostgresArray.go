@@ -1,13 +1,11 @@
 package parsers
 
 import (
-	"fmt"
 	"strings"
 )
 
 func ParsePostgresArray(initial string) (result []string) {
 	stripped := initial[1 : len(initial)-1]
-	fmt.Printf("Stripped: %s\n", stripped)
 
 	var lines []string
 	var curLine string
