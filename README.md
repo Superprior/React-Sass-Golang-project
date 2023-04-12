@@ -4,7 +4,9 @@ Typus is a website created for practising quick code typing. No third-party fron
 
 ## Preview
 
-![Code preview](./typus_frontend/public/example.png)
+<p align="center">
+    <image src="./typus_frontend/public/example.png" />
+</p>
 
 ## Ingredients
 
