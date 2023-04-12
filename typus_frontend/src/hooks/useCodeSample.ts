@@ -45,7 +45,7 @@ function useCodeSample(props: Props): State {
 
         const fetchParseData = async () => {
             try {
-                const url = `${process.env.REACT_APP_PROTOCOL}://${process.env.REACT_APP_HOSTNAME}:8080/api/samples`;
+                const url = `${process.env.REACT_APP_PROTOCOL}://${process.env.REACT_APP_HOSTNAME}:8080/api/samples/${props.exampleId}`;
                 const responseData = await fetch(url, {
                     method: 'GET',
                     mode: 'cors',
@@ -54,24 +54,18 @@ function useCodeSample(props: Props): State {
                     }
                 });
                 if (responseData.status === 200) {
-                    const samples = await responseData.json();
-                    if (samples.length > 0) {
-                        const sampleContent: string[] = samples[0].Content
+                    const sample = await responseData.json();
+                    const lines: CodeLine[] = []
 
-                        const lines: CodeLine[] = []
-
-                        for (let i = 0; i < sampleContent.length; i++) {
-                            const line: CodeLine = { chars: [] }
-                            for (let j = 0; j < sampleContent[i].length; j++) {
-                                const char: CodeCharacter = { c: sampleContent[i][j], wasTyped: false, isHighlighted: false };
-                                line.chars.push(char);
-                            }
-                            lines.push(line);
+                    for (let i = 0; i < sample.Content.length; i++) {
+                        const line: CodeLine = { chars: [] }
+                        for (let j = 0; j < sample.Content[i].length; j++) {
+                            const char: CodeCharacter = { c: sample.Content[i][j], wasTyped: false, isHighlighted: false };
+                            line.chars.push(char);
                         }
-                        setState({ status: 'success', codeSample: lines, error: null })
-                    } else {
-                        setState({ status: 'error', codeSample: null, error: "Empty response from the server" })
+                        lines.push(line);
                     }
+                    setState({ status: 'success', codeSample: lines, error: null })
                 } else {
                     setState({ status: 'error', codeSample: null, error: `Could not fulfill the request, code ${responseData.status}` })
                 }
