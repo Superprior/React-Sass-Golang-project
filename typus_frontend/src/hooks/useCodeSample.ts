@@ -10,7 +10,7 @@ interface Props {
      * @interface
      */
 
-    exampleId: string;
+    sampleId: string;
 }
 
 /**
@@ -45,7 +45,7 @@ function useCodeSample(props: Props): State {
 
         const fetchParseData = async () => {
             try {
-                const url = `${process.env.REACT_APP_PROTOCOL}://${process.env.REACT_APP_HOSTNAME}:8080/api/samples/${props.exampleId}`;
+                const url = `${process.env.REACT_APP_PROTOCOL}://${process.env.REACT_APP_HOSTNAME}:8080/api/samples/${props.sampleId}`;
                 const responseData = await fetch(url, {
                     method: 'GET',
                     mode: 'cors',

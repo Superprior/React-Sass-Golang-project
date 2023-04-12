@@ -11,7 +11,7 @@ const IndexPage: React.FC<{}> = (props: Props): JSX.Element => {
     return (
         <>
             <Header />
-            <CodeArea />
+            <CodeArea sampleId='1' />
         </>
     );
 }

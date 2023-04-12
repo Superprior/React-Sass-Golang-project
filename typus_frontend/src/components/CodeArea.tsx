@@ -5,11 +5,13 @@ import isCodeSymbol from '../lib/isCodeSymbol';
 import useCodeSample from '../hooks/useCodeSample';
 
 
-interface Props {}
+interface Props {
+    sampleId: string;
+}
 
 
-const CodeArea: React.FC<{}> = (props: Props): JSX.Element => {
-    const { status, codeSample, error } = useCodeSample({ exampleId: '2' });
+function CodeArea(props: Props): JSX.Element {
+    const { status, codeSample, error } = useCodeSample({ sampleId: props.sampleId });
     const [lines, _setLines] = useState<CodeLine[]>([]);
     const [csr, _setCsr] = useState<Cursor>({ x: 0, y: 0});
 
