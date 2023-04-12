@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -16,7 +17,7 @@ import (
 
 func configureHeaders(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
-	(*w).Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
 	(*w).Header().Set("Access-Control-Allow-Headers", "*")
 	(*w).Header().Set("Content-Type", "application/json; charset=UTF-8")
 }
@@ -29,6 +30,12 @@ func (s *APIserver) handleApiList() http.HandlerFunc {
 
 func (s *APIserver) handleAdminAuth() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		configureHeaders(&w)
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
 		w.Header().Set("Content-Type", "application/json")
 
 		err := godotenv.Load(".env")
@@ -37,7 +44,11 @@ func (s *APIserver) handleAdminAuth() http.HandlerFunc {
 		}
 
 		adminPassword := os.Getenv("ADMIN_PASSWORD")
-		providedPassword := r.Header.Get("Authorization")
+
+		reqBody, _ := ioutil.ReadAll(r.Body)
+		var data struct{ Pwd string }
+		json.Unmarshal(reqBody, &data)
+		providedPassword := data.Pwd
 
 		if providedPassword == "" {
 			w.WriteHeader(http.StatusBadRequest)
