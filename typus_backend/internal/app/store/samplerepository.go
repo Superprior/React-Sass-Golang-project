@@ -87,3 +87,12 @@ func (r *SampleRepository) CreateInstance(title string, langSlug string, context
 
 	return id, nil
 }
+
+func (r *SampleRepository) DeleteInstance(id int) error {
+	err := r.store.db.QueryRow(fmt.Sprintf("DELETE FROM code_samples WHERE id=%d;", id))
+
+	if err != nil {
+		println(err)
+	}
+	return nil
+}

@@ -42,6 +42,7 @@ func (s *APIserver) configureRouter() {
 	s.router.HandleFunc("/api/samples", s.handleSamplesList()).Methods("GET", "OPTIONS")
 	s.router.HandleFunc("/api/samples/", s.handleCreateSample()).Methods("POST", "OPTIONS")
 	s.router.HandleFunc("/api/samples/{id}", s.handleSampleInstance()).Methods("GET", "OPTIONS")
+	s.router.HandleFunc("/api/samples/{id}", s.handleDeleteSample()).Methods("DELETE", "OPTIONS")
 	s.router.HandleFunc("/api/auth_admin", s.handleAdminAuth()).Methods("POST", "OPTIONS")
 }
 

@@ -203,7 +203,6 @@ func (s *APIserver) handleCreateSample() http.HandlerFunc {
 
 			id, err := s.store.Sample().CreateInstance(rb.Title, rb.LangSlug, rb.Content)
 			if err != nil {
-
 				w.WriteHeader(http.StatusBadRequest)
 				fmt.Printf("API REQUEST: /api/samples/ [400 BAD REQUEST]\n")
 				return
@@ -214,6 +213,34 @@ func (s *APIserver) handleCreateSample() http.HandlerFunc {
 			w.Write(resp)
 
 			fmt.Printf("API REQUEST: /api/samples/%d [201 CREATED]\n", id)
+		}
+	}
+}
+
+func (s *APIserver) handleDeleteSample() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		configureHeaders(&w)
+
+		if r.Method == "DELETE" {
+			vars := mux.Vars(r)
+			strKey := vars["id"]
+			intKey, err := strconv.Atoi(strKey)
+
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				fmt.Printf("API REQUEST: /api/samples [400 BAD REQUEST]\n")
+				return
+			}
+
+			err = s.store.Sample().DeleteInstance(intKey)
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				fmt.Printf("API REQUEST: /api/samples/%d [400 BAD REQUEST]\n", intKey)
+				return
+			}
+
+			w.WriteHeader(http.StatusNoContent)
+			fmt.Printf("API REQUEST: /api/samples/%d [204 NO CONTENT]", intKey)
 		}
 	}
 }
