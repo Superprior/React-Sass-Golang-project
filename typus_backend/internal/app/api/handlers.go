@@ -180,3 +180,33 @@ func (s *APIserver) handleSampleInstance() http.HandlerFunc {
 		fmt.Println("API REQUEST: /api/languages [200 OK]")
 	}
 }
+
+func (s *APIserver) handleCreateSample() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		configureHeaders(&w)
+
+		if r.Method == "POST" {
+			type ReqBody struct {
+				Title    string `json:"Title"`
+				LangSlug string `json:"LangSlug"`
+				Content  string `json:"Content"`
+			}
+
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				fmt.Printf("API REQUEST: /api/samples/ [400 BAD REQUEST]\n")
+				return
+			}
+
+			rb := ReqBody{}
+			json.Unmarshal(body, &rb)
+
+			// fmt.Println(rb.Title)
+			// fmt.Println(rb.LangSlug)
+			// fmt.Printf("%s\n", rb.Content)
+
+			w.WriteHeader(http.StatusCreated)
+		}
+	}
+}
