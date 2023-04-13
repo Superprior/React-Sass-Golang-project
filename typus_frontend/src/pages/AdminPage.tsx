@@ -10,6 +10,25 @@ function AdminPage(props: Props): JSX.Element {
     const [access, setAccess] = useState<Boolean>(false);
     const [pwdError, setPwdError] = useState<Boolean>(false);
 
+    useEffect(() => {
+        var codeArea = document.getElementById("content") as HTMLInputElement;
+
+        codeArea?.addEventListener('keydown', (e: KeyboardEvent) => {
+            if (e.key === "Tab") {
+                e.preventDefault();
+
+                if (codeArea.selectionStart) {
+                    codeArea.setRangeText(
+                        "    ", 
+                        codeArea.selectionStart, 
+                        codeArea.selectionStart, 
+                        'end'
+                    );
+                }
+            }
+        })
+    }, []);
+
     const handleSubmitPassword = async (event: any) => {
         event.preventDefault();
      
@@ -52,7 +71,7 @@ function AdminPage(props: Props): JSX.Element {
                         </div>
                         <div style={{ display: 'block' }}>
                             <p style={{ margin: '0' }}>Content</p>
-                            <textarea name="content" rows={20} cols={100} required></textarea>
+                            <textarea name="content" id="content" rows={20} cols={100} required></textarea>
                         </div>
                         <div>
                             <input type="submit" />
