@@ -1,34 +1,18 @@
 package parsers
 
-import (
-	"strings"
-)
-
-func ParsePostgresArray(initial string) (result []string) {
-	stripped := initial[1 : len(initial)-1]
-
+func ParsePostgresArray(initial string) []string {
 	var lines []string
 	var curLine string
-	var insideLine bool = true
 
-	for i := 1; i < len(stripped); i++ {
-		if stripped[i] == '"' && stripped[i-1] != '\\' {
-			if insideLine {
-				curLine = strings.Replace(curLine, "\\\\t", "    ", -1)
-				curLine = strings.Replace(curLine, "\\\\n", "", -1)
-				curLine = strings.Replace(curLine, "\\", "", -1)
-				lines = append(lines, curLine)
-				curLine = ""
-				insideLine = false
-			} else {
-				insideLine = true
-			}
+	for i := 0; i < len(initial)-1; i++ {
+		if initial[i] == '\\' && initial[i+1] == '\\' {
+			lines = append(lines, curLine)
+			curLine = ""
+			i += 1
 		} else {
-			if insideLine {
-				curLine += string(stripped[i])
-			}
+			curLine += string(initial[i])
 		}
 	}
-
+	lines = append(lines, curLine+string(initial[len(initial)-1]))
 	return lines
 }

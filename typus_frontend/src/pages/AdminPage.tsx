@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import useAdminAccess from '../lib/callAuthAdminAPI';
 import callAuthAdminAPI from '../lib/callAuthAdminAPI';
 import postCodeSample from '../lib/postCodeSample';
 
@@ -24,9 +23,9 @@ function AdminPage(props: Props): JSX.Element {
                         codeArea.selectionStart, 
                         'end'
                     );
-                }
-            }
-        })
+                };
+            };
+        });
     }, []);
 
     const handleSubmitPassword = async (event: any) => {
@@ -45,13 +44,13 @@ function AdminPage(props: Props): JSX.Element {
 
     const handleCreateSample = async (event: any) => {
         event.preventDefault();
-        const { title_, langSlug, content } = document.forms[0];
+        const { title_, content } = document.forms[0];
 
-        const created = await postCodeSample({ title: title_.value, langSlug: langSlug.value, content: content.value });
+        const created = await postCodeSample({ title: title_.value, langSlug: 'py', content: content.value });
         if (created == true) {
-            alert('Created!');
+            // handle this...
         } else {
-            alert('Error!');
+            // and handle errors...
         }
     }
 
@@ -66,11 +65,7 @@ function AdminPage(props: Props): JSX.Element {
                             <input name="title_" required />
                         </div>
                         <div style={{ display: 'block' }}>
-                            <p style={{ margin: '0' }}>Language slug</p>
-                            <input name="langSlug" required />
-                        </div>
-                        <div style={{ display: 'block' }}>
-                            <p style={{ margin: '0' }}>Content</p>
+                            <p style={{ margin: '0' }}>Content (python only)</p>
                             <textarea name="content" id="content" rows={20} cols={100} required></textarea>
                         </div>
                         <div>

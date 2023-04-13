@@ -152,7 +152,6 @@ func (s *APIserver) handleSampleInstance() http.HandlerFunc {
 
 			fmt.Printf("API REQUEST: /api/samples/%s [400 BAD REQUEST]\n", strKey)
 		}
-		fmt.Printf("%T %d\n", intKey, intKey)
 
 		data, err := s.store.Sample().GetInstance(intKey)
 
@@ -202,11 +201,19 @@ func (s *APIserver) handleCreateSample() http.HandlerFunc {
 			rb := ReqBody{}
 			json.Unmarshal(body, &rb)
 
-			// fmt.Println(rb.Title)
-			// fmt.Println(rb.LangSlug)
-			// fmt.Printf("%s\n", rb.Content)
+			id, err := s.store.Sample().CreateInstance(rb.Title, rb.LangSlug, rb.Content)
+			if err != nil {
+
+				w.WriteHeader(http.StatusBadRequest)
+				fmt.Printf("API REQUEST: /api/samples/ [400 BAD REQUEST]\n")
+				return
+			}
 
 			w.WriteHeader(http.StatusCreated)
+			resp, _ := json.Marshal(map[string]int{"id": id})
+			w.Write(resp)
+
+			fmt.Printf("API REQUEST: /api/samples/%d [201 CREATED]\n", id)
 		}
 	}
 }

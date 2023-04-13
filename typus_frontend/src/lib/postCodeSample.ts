@@ -24,6 +24,7 @@ const postCodeSample = async (props: Props): Promise<boolean> => {
             })
         });
         if (responseData.status === 201) {
+            const responseJSON = await responseData.json();
             return true;
         } else {
             /**
