@@ -1,8 +1,10 @@
 package parsers
 
 func ParsePostgresArray(initial string) []string {
-	var lines []string
-	var curLine string
+	var (
+		lines   []string
+		curLine string
+	)
 
 	for i := 0; i < len(initial)-1; i++ {
 		if initial[i] == '\\' && initial[i+1] == '\\' {

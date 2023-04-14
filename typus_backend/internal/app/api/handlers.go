@@ -1,16 +1,14 @@
 package apiserver
 
 import (
+	"backend/pkg/loggers"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
-
-	"github.com/joho/godotenv"
 
 	"github.com/gorilla/mux"
 )
@@ -34,41 +32,45 @@ func (s *APIserver) handleAdminAuth() http.HandlerFunc {
 
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
 
-		err := godotenv.Load(".env")
-		if err != nil {
-			log.Fatal("Failed to load .env file")
-		}
+		} else if r.Method == "POST" {
+			adminPassword := os.Getenv("ADMIN_PASSWORD")
 
-		adminPassword := os.Getenv("ADMIN_PASSWORD")
-
-		reqBody, _ := ioutil.ReadAll(r.Body)
-		var data struct{ Pwd string }
-		json.Unmarshal(reqBody, &data)
-		providedPassword := data.Pwd
-
-		if providedPassword == "" {
-			w.WriteHeader(http.StatusBadRequest)
-			resp, _ := json.Marshal(map[string]string{"access": "PASSWORD NOT PROVIDED"})
-			w.Write(resp)
-
-			fmt.Println("API REQUEST: /api/auth_admin [400 BAD REQUEST]")
-		} else {
-			if adminPassword == providedPassword {
-				w.WriteHeader(http.StatusOK)
-				resp, _ := json.Marshal(map[string]string{"access": "OK"})
+			if adminPassword == "" {
+				w.WriteHeader(http.StatusInternalServerError)
+				resp, _ := json.Marshal(map[string]string{"message": "Could not handle request"})
 				w.Write(resp)
 
-				fmt.Println("API REQUEST: /api/auth_admin [200 OK]")
+				loggers.LogEnvError("ADMIN_PASSWORD")
+				return
+			}
+
+			var data struct{ Pwd string }
+
+			reqBody, _ := ioutil.ReadAll(r.Body)
+			json.Unmarshal(reqBody, &data)
+			providedPassword := data.Pwd
+
+			if providedPassword == "" {
+				w.WriteHeader(http.StatusBadRequest)
+				resp, _ := json.Marshal(map[string]string{"message": "Password was not provided"})
+				w.Write(resp)
+
+				loggers.LogRequestResult("POST", "auth_admin/", http.StatusBadRequest)
 			} else {
-				w.WriteHeader(http.StatusUnauthorized)
-				resp, _ := json.Marshal(map[string]string{"access": "WRONG PASSWORD"})
-				w.Write(resp)
+				if adminPassword == providedPassword {
+					w.WriteHeader(http.StatusOK)
+					resp, _ := json.Marshal(map[string]string{"message": "OK"})
+					w.Write(resp)
 
-				fmt.Println("API REQUEST: /api/auth_admin [401 UNAUTHORIZED]")
+					loggers.LogRequestResult("POST", "auth_admin/", http.StatusOK)
+				} else {
+					w.WriteHeader(http.StatusUnauthorized)
+					resp, _ := json.Marshal(map[string]string{"access": "Wrong password"})
+					w.Write(resp)
+
+					loggers.LogRequestResult("POST", "auth_admin/", http.StatusUnauthorized)
+				}
 			}
 		}
 	}
@@ -76,32 +78,39 @@ func (s *APIserver) handleAdminAuth() http.HandlerFunc {
 
 func (s *APIserver) handleLanguagesList() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		data, err := s.store.Language().GetList()
+		configureHeaders(&w)
 
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			resp, _ := json.Marshal(map[string]string{"error": "could not get query the request"})
-			w.Write(resp)
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
 
-			fmt.Println("API REQUEST: /api/languages [500 INTERNAL SERVER ERROR]")
-			return
+		} else if r.Method == "GET" {
+			data, err := s.store.Language().GetList()
+
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				resp, _ := json.Marshal(map[string]string{"message": "Could not query the request"})
+				w.Write(resp)
+
+				loggers.LogRequestResult("GET", "languages", http.StatusInternalServerError)
+				return
+			}
+
+			jsonResp, err := json.Marshal(data)
+
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				resp, _ := json.Marshal(map[string]string{"message": "Could not encode JSON"})
+				w.Write(resp)
+
+				loggers.LogRequestResult("GET", "languages", http.StatusInternalServerError)
+				return
+			}
+
+			w.WriteHeader(http.StatusOK)
+			w.Write(jsonResp)
+
+			loggers.LogRequestResult("GET", "languages", http.StatusOK)
 		}
-
-		jsonResp, err := json.Marshal(data)
-
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			resp, _ := json.Marshal(map[string]string{"error": "could not encode json"})
-			w.Write(resp)
-
-			fmt.Println("API REQUEST: /api/languages [500 INTERNAL SERVER ERROR]")
-			return
-		}
-
-		w.WriteHeader(http.StatusOK)
-		w.Write(jsonResp)
-		fmt.Println("API REQUEST: /api/languages [200 OK]")
 	}
 }
 
@@ -109,31 +118,37 @@ func (s *APIserver) handleSamplesList() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		configureHeaders(&w)
 
-		data, err := s.store.Sample().GetList()
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
 
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			resp, _ := json.Marshal(map[string]string{"error": "could not get query the request"})
-			w.Write(resp)
+		} else if r.Method == "GET" {
+			data, err := s.store.Sample().GetList()
 
-			fmt.Println("API REQUEST: /api/samples [500 INTERNAL SERVER ERROR]")
-			return
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				resp, _ := json.Marshal(map[string]string{"message": "Could not query the request"})
+				w.Write(resp)
+
+				loggers.LogRequestResult("GET", "samples", http.StatusInternalServerError)
+				return
+			}
+
+			jsonResp, err := json.Marshal(data)
+
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				resp, _ := json.Marshal(map[string]string{"message": "Could not encode JSON"})
+				w.Write(resp)
+
+				loggers.LogRequestResult("GET", "samples", http.StatusInternalServerError)
+				return
+			}
+
+			w.WriteHeader(http.StatusOK)
+			w.Write(jsonResp)
+
+			loggers.LogRequestResult("GET", "samples", http.StatusOK)
 		}
-
-		jsonResp, err := json.Marshal(data)
-
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			resp, _ := json.Marshal(map[string]string{"error": "could not encode json"})
-			w.Write(resp)
-
-			fmt.Println("API REQUEST: /api/samples [500 INTERNAL SERVER ERROR]")
-			return
-		}
-
-		w.WriteHeader(http.StatusOK)
-		w.Write(jsonResp)
-		fmt.Println("API REQUEST: /api/languages [200 OK]")
 	}
 }
 
@@ -141,42 +156,50 @@ func (s *APIserver) handleSampleInstance() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		configureHeaders(&w)
 
-		vars := mux.Vars(r)
-		strKey := vars["id"]
-		intKey, err := strconv.Atoi(strKey)
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
 
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			resp, _ := json.Marshal(map[string]string{"error": "invalid ID type"})
-			w.Write(resp)
+		} else if r.Method == "GET" {
+			vars := mux.Vars(r)
+			strKey := vars["id"]
+			intKey, err := strconv.Atoi(strKey)
 
-			fmt.Printf("API REQUEST: /api/samples/%s [400 BAD REQUEST]\n", strKey)
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				resp, _ := json.Marshal(map[string]string{"message": "Invalid sample ID provided"})
+				w.Write(resp)
+
+				loggers.LogRequestResult("GET", fmt.Sprintf("samples/%s", strKey), http.StatusBadRequest)
+				return
+			}
+
+			data, err := s.store.Sample().GetInstance(intKey)
+
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				resp, _ := json.Marshal(map[string]string{"message": "No sample with such ID"})
+				w.Write(resp)
+
+				loggers.LogRequestResult("GET", fmt.Sprintf("samples/%d", intKey), http.StatusBadRequest)
+				return
+			}
+
+			jsonResp, err := json.Marshal(data)
+
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				resp, _ := json.Marshal(map[string]string{"message": "could not encode json"})
+				w.Write(resp)
+
+				loggers.LogRequestResult("GET", fmt.Sprintf("samples/%d", intKey), http.StatusInternalServerError)
+				return
+			}
+
+			w.WriteHeader(http.StatusOK)
+			w.Write(jsonResp)
+
+			loggers.LogRequestResult("GET", fmt.Sprintf("samples/%d", intKey), http.StatusOK)
 		}
-
-		data, err := s.store.Sample().GetInstance(intKey)
-
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			resp, _ := json.Marshal(map[string]string{"error": "invalid ID"})
-			w.Write(resp)
-
-			fmt.Printf("API REQUEST: /api/samples/%d [400 BAD REQUEST]\n", intKey)
-		}
-
-		jsonResp, err := json.Marshal(data)
-
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			resp, _ := json.Marshal(map[string]string{"error": "could not encode json"})
-			w.Write(resp)
-
-			fmt.Printf("API REQUEST: /api/samples/%d [500 INTERNAL SERVER ERROR]\n", intKey)
-			return
-		}
-
-		w.WriteHeader(http.StatusOK)
-		w.Write(jsonResp)
-		fmt.Println("API REQUEST: /api/languages [200 OK]")
 	}
 }
 
@@ -184,7 +207,10 @@ func (s *APIserver) handleCreateSample() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		configureHeaders(&w)
 
-		if r.Method == "POST" {
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+
+		} else if r.Method == "POST" {
 			type ReqBody struct {
 				Title    string `json:"Title"`
 				LangSlug string `json:"LangSlug"`
@@ -192,19 +218,26 @@ func (s *APIserver) handleCreateSample() http.HandlerFunc {
 			}
 
 			body, err := ioutil.ReadAll(r.Body)
+
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
-				fmt.Printf("API REQUEST: /api/samples/ [400 BAD REQUEST]\n")
+				resp, _ := json.Marshal(map[string]string{"message": "Invalid data provided"})
+				w.Write(resp)
+
+				loggers.LogRequestResult("POST", "samples/", http.StatusBadRequest)
 				return
 			}
 
 			rb := ReqBody{}
 			json.Unmarshal(body, &rb)
-
 			id, err := s.store.Sample().CreateInstance(rb.Title, rb.LangSlug, rb.Content)
+
 			if err != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				fmt.Printf("API REQUEST: /api/samples/ [400 BAD REQUEST]\n")
+				w.WriteHeader(http.StatusInternalServerError)
+				resp, _ := json.Marshal(map[string]string{"message": "Could not create sample instance"})
+				w.Write(resp)
+
+				loggers.LogRequestResult("POST", "samples/", http.StatusInternalServerError)
 				return
 			}
 
@@ -212,7 +245,7 @@ func (s *APIserver) handleCreateSample() http.HandlerFunc {
 			resp, _ := json.Marshal(map[string]int{"id": id})
 			w.Write(resp)
 
-			fmt.Printf("API REQUEST: /api/samples/%d [201 CREATED]\n", id)
+			loggers.LogRequestResult("POST", fmt.Sprintf("samples/%d", id), http.StatusCreated)
 		}
 	}
 }
@@ -221,26 +254,39 @@ func (s *APIserver) handleDeleteSample() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		configureHeaders(&w)
 
-		if r.Method == "DELETE" {
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+
+		} else if r.Method == "DELETE" {
 			vars := mux.Vars(r)
 			strKey := vars["id"]
 			intKey, err := strconv.Atoi(strKey)
 
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
-				fmt.Printf("API REQUEST: /api/samples [400 BAD REQUEST]\n")
+				resp, _ := json.Marshal(map[string]string{"message": "Invalid ID provided"})
+				w.Write(resp)
+
+				loggers.LogRequestResult("DELETE", fmt.Sprintf("samples/%s", strKey), http.StatusBadRequest)
 				return
 			}
 
 			err = s.store.Sample().DeleteInstance(intKey)
+
 			if err != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				fmt.Printf("API REQUEST: /api/samples/%d [400 BAD REQUEST]\n", intKey)
+				w.WriteHeader(http.StatusInternalServerError)
+				resp, _ := json.Marshal(map[string]string{"message": "Could not delete sample instance"})
+				w.Write(resp)
+
+				loggers.LogRequestResult("DELETE", fmt.Sprintf("samples/%s", strKey), http.StatusInternalServerError)
 				return
 			}
 
-			w.WriteHeader(http.StatusNoContent)
-			fmt.Printf("API REQUEST: /api/samples/%d [204 NO CONTENT]", intKey)
+			w.WriteHeader(http.StatusOK)
+			resp, _ := json.Marshal(map[string]int{"id": intKey})
+			w.Write(resp)
+
+			loggers.LogRequestResult("DELETE", fmt.Sprintf("samples/%s", strKey), http.StatusOK)
 		}
 	}
 }

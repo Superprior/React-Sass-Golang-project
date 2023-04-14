@@ -2,7 +2,7 @@ package apiserver
 
 import (
 	"backend/internal/app/store"
-	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -28,7 +28,7 @@ func (s *APIserver) Start() error {
 		return err
 	}
 
-	fmt.Println("INFO: server started")
+	log.Println("INFO: Server started")
 
 	return http.ListenAndServe(s.config.BackendPort, s.router)
 }

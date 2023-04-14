@@ -20,8 +20,11 @@ func (r *SampleRepository) GetList() (*[]model.Sample, error) {
 	var samples []model.Sample
 
 	for rows.Next() {
-		var sample model.Sample
-		var codeLinesStr string
+		var (
+			sample       model.Sample
+			codeLinesStr string
+		)
+
 		if err := rows.Scan(&sample.ID, &sample.Title, &sample.LangSlug); err != nil {
 			return &samples, nil
 		}
