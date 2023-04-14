@@ -5,6 +5,10 @@ import (
 	"backend/pkg/loggers"
 	"fmt"
 	"os"
+
+	_ "backend/docs"
+
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 type Config struct {
@@ -32,6 +36,7 @@ func (s *APIserver) configureRouter() {
 	s.router.HandleFunc("/api/samples/{id}", s.handleSampleInstance()).Methods("GET", "OPTIONS")
 	s.router.HandleFunc("/api/samples/{id}", s.handleDeleteSample()).Methods("DELETE", "OPTIONS")
 	s.router.HandleFunc("/api/auth_admin/", s.handleAdminAuth()).Methods("POST", "OPTIONS")
+	s.router.PathPrefix("/docs/").Handler(httpSwagger.WrapHandler)
 }
 
 func (s *APIserver) configureStore() error {
