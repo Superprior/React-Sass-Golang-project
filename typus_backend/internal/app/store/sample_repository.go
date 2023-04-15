@@ -75,13 +75,13 @@ func (r *SampleRepository) GetInstance(id int) (*model.Sample, error) {
 func (r *SampleRepository) CreateInstance(title string, langSlug string, context string) (int, error) {
 	codeLines := parsers.RawStringToLinesArray(context)
 	arrayToInsert := parsers.LinesArrayToPostgresArray(codeLines)
-	var id int
 
 	query := fmt.Sprintf(
 		"INSERT INTO code_samples (title, content, lang_slug) VALUES ('%s', ARRAY %s, '%s') RETURNING id;",
 		title, arrayToInsert, langSlug,
 	)
 
+	var id int
 	err := r.store.db.QueryRow(query).Scan(&id)
 
 	if err != nil {

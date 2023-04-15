@@ -7,3 +7,9 @@ type PostSampleBody struct {
 	LangSlug string `json:"LangSlug"`
 	Content  string `json:"Content"`
 }
+
+type RegisterBody struct {
+	Username string `json:"Username"`
+	Email    string `json:"Email"`
+	Password string `json:"Password"`
+}

@@ -12,6 +12,7 @@ type Store struct {
 	db                 *sql.DB
 	languageRepository *LanguageRepository
 	sampleRepository   *SampleRepository
+	userRepository     *UserRepository
 }
 
 func New(config *Config) *Store {
@@ -64,4 +65,16 @@ func (s *Store) Sample() *SampleRepository {
 	}
 
 	return s.sampleRepository
+}
+
+func (s *Store) User() *UserRepository {
+	if s.userRepository != nil {
+		return s.userRepository
+	}
+
+	s.userRepository = &UserRepository{
+		store: s,
+	}
+
+	return s.userRepository
 }
