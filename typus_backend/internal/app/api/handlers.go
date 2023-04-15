@@ -26,6 +26,17 @@ func (s *APIserver) handleApiList() http.HandlerFunc {
 	}
 }
 
+// @Summary Authorize admin user
+// @Description Check for admin rights and give the permission
+// @Tags Auth
+//
+// @Produce json
+// @Param data body apiserver.PasswordBody true "Provided password"
+// @Success 200 {object} apiserver.MessageResponse "Autorized successfully"
+// @Failure 500 {object} apiserver.MessageResponse "Could not handle the request (server error)"
+// @Failure 400 {object} apiserver.MessageResponse "Password was not provided"
+// @Failure 401 {object} apiserver.MessageResponse "Wrong password provided"
+// @Router /auth_admin/ [post]
 func (s *APIserver) handleAdminAuth() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		configureHeaders(&w)
@@ -38,35 +49,34 @@ func (s *APIserver) handleAdminAuth() http.HandlerFunc {
 
 			if adminPassword == "" {
 				w.WriteHeader(http.StatusInternalServerError)
-				resp, _ := json.Marshal(map[string]string{"message": "Could not handle request"})
+				resp, _ := json.Marshal(MessageResponse{"Could not handle request"})
 				w.Write(resp)
 
 				loggers.LogEnvError("ADMIN_PASSWORD")
 				return
 			}
 
-			var data struct{ Pwd string }
-
+			data := PasswordBody{}
 			reqBody, _ := ioutil.ReadAll(r.Body)
 			json.Unmarshal(reqBody, &data)
 			providedPassword := data.Pwd
 
 			if providedPassword == "" {
 				w.WriteHeader(http.StatusBadRequest)
-				resp, _ := json.Marshal(map[string]string{"message": "Password was not provided"})
+				resp, _ := json.Marshal(MessageResponse{"Password was not provided"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("POST", "auth_admin/", http.StatusBadRequest)
 			} else {
 				if adminPassword == providedPassword {
 					w.WriteHeader(http.StatusOK)
-					resp, _ := json.Marshal(map[string]string{"message": "OK"})
+					resp, _ := json.Marshal(MessageResponse{"OK"})
 					w.Write(resp)
 
 					loggers.LogRequestResult("POST", "auth_admin/", http.StatusOK)
 				} else {
 					w.WriteHeader(http.StatusUnauthorized)
-					resp, _ := json.Marshal(map[string]string{"access": "Wrong password"})
+					resp, _ := json.Marshal(MessageResponse{"Wrong password"})
 					w.Write(resp)
 
 					loggers.LogRequestResult("POST", "auth_admin/", http.StatusUnauthorized)
@@ -76,6 +86,14 @@ func (s *APIserver) handleAdminAuth() http.HandlerFunc {
 	}
 }
 
+// @Summary Get all Languages
+// @Description Get the complete Languages list
+// @Tags Language
+//
+// @Produce json
+// @Success 200 {array} model.Language
+// @Failure 500 {object} apiserver.MessageResponse "Could not query the request or encode JSON"
+// @Router /languages [get]
 func (s *APIserver) handleLanguagesList() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		configureHeaders(&w)
@@ -88,7 +106,7 @@ func (s *APIserver) handleLanguagesList() http.HandlerFunc {
 
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				resp, _ := json.Marshal(map[string]string{"message": "Could not query the request"})
+				resp, _ := json.Marshal(MessageResponse{"Could not query the request"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("GET", "languages", http.StatusInternalServerError)
@@ -99,7 +117,7 @@ func (s *APIserver) handleLanguagesList() http.HandlerFunc {
 
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				resp, _ := json.Marshal(map[string]string{"message": "Could not encode JSON"})
+				resp, _ := json.Marshal(MessageResponse{"Could not encode JSON"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("GET", "languages", http.StatusInternalServerError)
@@ -114,6 +132,14 @@ func (s *APIserver) handleLanguagesList() http.HandlerFunc {
 	}
 }
 
+// @Summary Get all Samples
+// @Description Get the complete Samples list
+// @Tags Sample
+//
+// @Produce json
+// @Success 200 {array} model.Sample
+// @Failure 500 {object} apiserver.MessageResponse "Could not query the request or encode JSON"
+// @Router /samples [get]
 func (s *APIserver) handleSamplesList() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		configureHeaders(&w)
@@ -126,7 +152,7 @@ func (s *APIserver) handleSamplesList() http.HandlerFunc {
 
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				resp, _ := json.Marshal(map[string]string{"message": "Could not query the request"})
+				resp, _ := json.Marshal(MessageResponse{"Could not query the request"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("GET", "samples", http.StatusInternalServerError)
@@ -137,7 +163,7 @@ func (s *APIserver) handleSamplesList() http.HandlerFunc {
 
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				resp, _ := json.Marshal(map[string]string{"message": "Could not encode JSON"})
+				resp, _ := json.Marshal(MessageResponse{"Could not encode JSON"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("GET", "samples", http.StatusInternalServerError)
@@ -152,6 +178,16 @@ func (s *APIserver) handleSamplesList() http.HandlerFunc {
 	}
 }
 
+// @Summary Get Sample by ID
+// @Description Retvieve a sample instance by provided ID
+// @Tags Sample
+//
+// @Produce json
+// @Param id path int true "Sample ID"
+// @Success 200 {object} model.Sample
+// @Failure 400 {object} apiserver.MessageResponse "Invalid ID provided or no sample with such ID"
+// @Failure 500 {object} apiserver.MessageResponse "Could not encode JSON"
+// @Router /samples/{id} [get]
 func (s *APIserver) handleSampleInstance() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		configureHeaders(&w)
@@ -166,7 +202,7 @@ func (s *APIserver) handleSampleInstance() http.HandlerFunc {
 
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
-				resp, _ := json.Marshal(map[string]string{"message": "Invalid sample ID provided"})
+				resp, _ := json.Marshal(MessageResponse{"Invalid sample ID provided"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("GET", fmt.Sprintf("samples/%s", strKey), http.StatusBadRequest)
@@ -177,7 +213,7 @@ func (s *APIserver) handleSampleInstance() http.HandlerFunc {
 
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
-				resp, _ := json.Marshal(map[string]string{"message": "No sample with such ID"})
+				resp, _ := json.Marshal(MessageResponse{"No sample with such ID"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("GET", fmt.Sprintf("samples/%d", intKey), http.StatusBadRequest)
@@ -188,7 +224,7 @@ func (s *APIserver) handleSampleInstance() http.HandlerFunc {
 
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				resp, _ := json.Marshal(map[string]string{"message": "could not encode json"})
+				resp, _ := json.Marshal(MessageResponse{"Could not encode json"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("GET", fmt.Sprintf("samples/%d", intKey), http.StatusInternalServerError)
@@ -203,6 +239,16 @@ func (s *APIserver) handleSampleInstance() http.HandlerFunc {
 	}
 }
 
+// @Summary Create Sample
+// @Description Create a new Sample instance
+// @Tags Sample
+//
+// @Produce json
+// @Param data body apiserver.PostSampleBody true "Provided data for creating Sample"
+// @Success 201 {object} apiserver.IdResponse "Returns id of the created Sample"
+// @Failure 400 {object} apiserver.MessageResponse "Invalid data provided"
+// @Failure 500 {object} apiserver.MessageResponse "Could not create Sample instance"
+// @Router /samples [post]
 func (s *APIserver) handleCreateSample() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		configureHeaders(&w)
@@ -211,30 +257,25 @@ func (s *APIserver) handleCreateSample() http.HandlerFunc {
 			w.WriteHeader(http.StatusOK)
 
 		} else if r.Method == "POST" {
-			type ReqBody struct {
-				Title    string `json:"Title"`
-				LangSlug string `json:"LangSlug"`
-				Content  string `json:"Content"`
-			}
 
 			body, err := ioutil.ReadAll(r.Body)
 
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
-				resp, _ := json.Marshal(map[string]string{"message": "Invalid data provided"})
+				resp, _ := json.Marshal(MessageResponse{"Invalid data provided"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("POST", "samples/", http.StatusBadRequest)
 				return
 			}
 
-			rb := ReqBody{}
+			rb := PostSampleBody{}
 			json.Unmarshal(body, &rb)
 			id, err := s.store.Sample().CreateInstance(rb.Title, rb.LangSlug, rb.Content)
 
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				resp, _ := json.Marshal(map[string]string{"message": "Could not create sample instance"})
+				resp, _ := json.Marshal(MessageResponse{"Could not create sample instance"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("POST", "samples/", http.StatusInternalServerError)
@@ -242,7 +283,7 @@ func (s *APIserver) handleCreateSample() http.HandlerFunc {
 			}
 
 			w.WriteHeader(http.StatusCreated)
-			resp, _ := json.Marshal(map[string]int{"id": id})
+			resp, _ := json.Marshal(IdResponse{id})
 			w.Write(resp)
 
 			loggers.LogRequestResult("POST", fmt.Sprintf("samples/%d", id), http.StatusCreated)
@@ -250,6 +291,16 @@ func (s *APIserver) handleCreateSample() http.HandlerFunc {
 	}
 }
 
+// @Summary Delete Sample
+// @Description Delete a Sample instance. Available only for admin user.
+// @Tags Sample
+//
+// @Produce json
+// @Param id path int true "Sample ID"
+// @Success 200 {object} apiserver.IdResponse "Returns id of the deleted Sample"
+// @failure 400 {object} apiserver.MessageResponse "invalid id provided"
+// @failure 500 {object} apiserver.MessageResponse "Could not delete Sample instance"
+// @Router /samples/{id} [delete]
 func (s *APIserver) handleDeleteSample() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		configureHeaders(&w)
@@ -264,7 +315,7 @@ func (s *APIserver) handleDeleteSample() http.HandlerFunc {
 
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
-				resp, _ := json.Marshal(map[string]string{"message": "Invalid ID provided"})
+				resp, _ := json.Marshal(MessageResponse{"Invalid ID provided"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("DELETE", fmt.Sprintf("samples/%s", strKey), http.StatusBadRequest)
@@ -275,7 +326,7 @@ func (s *APIserver) handleDeleteSample() http.HandlerFunc {
 
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				resp, _ := json.Marshal(map[string]string{"message": "Could not delete sample instance"})
+				resp, _ := json.Marshal(MessageResponse{"Could not delete sample instance"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("DELETE", fmt.Sprintf("samples/%s", strKey), http.StatusInternalServerError)
@@ -283,7 +334,7 @@ func (s *APIserver) handleDeleteSample() http.HandlerFunc {
 			}
 
 			w.WriteHeader(http.StatusOK)
-			resp, _ := json.Marshal(map[string]int{"id": intKey})
+			resp, _ := json.Marshal(IdResponse{intKey})
 			w.Write(resp)
 
 			loggers.LogRequestResult("DELETE", fmt.Sprintf("samples/%s", strKey), http.StatusOK)

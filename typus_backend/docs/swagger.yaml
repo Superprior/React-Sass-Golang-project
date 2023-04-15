@@ -1,4 +1,203 @@
+basePath: /api
+definitions:
+  apiserver.IdResponse:
+    description: Object that is returned in endpoints where ID needs to be returned
+    type: object
+  apiserver.MessageResponse:
+    description: Object that is returned when the actual body is empty
+    type: object
+  apiserver.PasswordBody:
+    description: Object that needs to be provided for authorizing a user
+    properties:
+      pwd:
+        type: string
+    type: object
+  apiserver.PostSampleBody:
+    description: Object that stores info about Sample that need to be created
+    properties:
+      Content:
+        type: string
+      LangSlug:
+        type: string
+      Title:
+        type: string
+    type: object
+  model.Language:
+    properties:
+      id:
+        type: integer
+      slug:
+        type: string
+      title:
+        type: string
+    type: object
+  model.Sample:
+    properties:
+      content:
+        items:
+          type: string
+        type: array
+      id:
+        type: integer
+      langSlug:
+        type: string
+      title:
+        type: string
+    type: object
+host: localhost:8080
 info:
   contact: {}
-paths: {}
+  title: Backend server of Typus
+  version: "1.0"
+paths:
+  /auth_admin/:
+    post:
+      description: Check for admin rights and give the permission
+      parameters:
+      - description: Provided password
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/apiserver.PasswordBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Autorized successfully
+          schema:
+            $ref: '#/definitions/apiserver.MessageResponse'
+        "400":
+          description: Password was not provided
+          schema:
+            $ref: '#/definitions/apiserver.MessageResponse'
+        "401":
+          description: Wrong password provided
+          schema:
+            $ref: '#/definitions/apiserver.MessageResponse'
+        "500":
+          description: Could not handle the request (server error)
+          schema:
+            $ref: '#/definitions/apiserver.MessageResponse'
+      summary: Authorize admin user
+      tags:
+      - Auth
+  /languages:
+    get:
+      description: Get the complete Languages list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Language'
+            type: array
+        "500":
+          description: Could not query the request or encode JSON
+          schema:
+            $ref: '#/definitions/apiserver.MessageResponse'
+      summary: Get all Languages
+      tags:
+      - Language
+  /samples:
+    get:
+      description: Get the complete Samples list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Sample'
+            type: array
+        "500":
+          description: Could not query the request or encode JSON
+          schema:
+            $ref: '#/definitions/apiserver.MessageResponse'
+      summary: Get all Samples
+      tags:
+      - Sample
+    post:
+      description: Create a new Sample instance
+      parameters:
+      - description: Provided data for creating Sample
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/apiserver.PostSampleBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Returns id of the created Sample
+          schema:
+            $ref: '#/definitions/apiserver.IdResponse'
+        "400":
+          description: Invalid data provided
+          schema:
+            $ref: '#/definitions/apiserver.MessageResponse'
+        "500":
+          description: Could not create Sample instance
+          schema:
+            $ref: '#/definitions/apiserver.MessageResponse'
+      summary: Create Sample
+      tags:
+      - Sample
+  /samples/{id}:
+    delete:
+      description: Delete a Sample instance. Available only for admin user.
+      parameters:
+      - description: Sample ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns id of the deleted Sample
+          schema:
+            $ref: '#/definitions/apiserver.IdResponse'
+        "400":
+          description: invalid id provided
+          schema:
+            $ref: '#/definitions/apiserver.MessageResponse'
+        "500":
+          description: Could not delete Sample instance
+          schema:
+            $ref: '#/definitions/apiserver.MessageResponse'
+      summary: Delete Sample
+      tags:
+      - Sample
+    get:
+      description: Retvieve a sample instance by provided ID
+      parameters:
+      - description: Sample ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Sample'
+        "400":
+          description: Invalid ID provided or no sample with such ID
+          schema:
+            $ref: '#/definitions/apiserver.MessageResponse'
+        "500":
+          description: Could not encode JSON
+          schema:
+            $ref: '#/definitions/apiserver.MessageResponse'
+      summary: Get Sample by ID
+      tags:
+      - Sample
 swagger: "2.0"

@@ -7,6 +7,11 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// @title Backend server of Typus
+// @version 1.0
+//
+// @host localhost:8080
+// @BasePath /api
 func main() {
 	if err := godotenv.Load(".env"); err != nil {
 		log.Panicln("Failed to load .env file")
