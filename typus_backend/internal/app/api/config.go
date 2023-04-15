@@ -4,12 +4,20 @@ import (
 	"backend/internal/app/store"
 	"backend/pkg/loggers"
 	"fmt"
+	"net/http"
 	"os"
 
 	_ "backend/docs"
 
 	httpSwagger "github.com/swaggo/http-swagger"
 )
+
+func configureHeaders(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	(*w).Header().Set("Access-Control-Allow-Headers", "*")
+	(*w).Header().Set("Content-Type", "application/json; charset=UTF-8")
+}
 
 type Config struct {
 	BackendPort string
@@ -35,7 +43,6 @@ func (s *APIserver) configureRouter() {
 	s.router.HandleFunc("/api/samples/", s.handleCreateSample()).Methods("POST", "OPTIONS")
 	s.router.HandleFunc("/api/samples/{id}", s.handleSampleInstance()).Methods("GET", "OPTIONS")
 	s.router.HandleFunc("/api/samples/{id}", s.handleDeleteSample()).Methods("DELETE", "OPTIONS")
-	s.router.HandleFunc("/api/auth_admin/", s.handleAdminAuth()).Methods("POST", "OPTIONS")
 	s.router.PathPrefix("/docs/").Handler(httpSwagger.WrapHandler)
 }
 

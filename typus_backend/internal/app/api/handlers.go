@@ -7,82 +7,14 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/gorilla/mux"
 )
 
-func configureHeaders(w *http.ResponseWriter) {
-	(*w).Header().Set("Access-Control-Allow-Origin", "*")
-	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
-	(*w).Header().Set("Access-Control-Allow-Headers", "*")
-	(*w).Header().Set("Content-Type", "application/json; charset=UTF-8")
-}
-
 func (s *APIserver) handleApiList() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, "API root")
-	}
-}
-
-// @Summary Authorize admin user
-// @Description Check for admin rights and give the permission
-// @Tags Auth
-//
-// @Produce json
-// @Param data body apiserver.PasswordBody true "Provided password"
-// @Success 200 {object} apiserver.MessageResponse "Autorized successfully"
-// @Failure 500 {object} apiserver.MessageResponse "Could not handle the request (server error)"
-// @Failure 400 {object} apiserver.MessageResponse "Password was not provided"
-// @Failure 401 {object} apiserver.MessageResponse "Wrong password provided"
-// @Router /auth_admin/ [post]
-func (s *APIserver) handleAdminAuth() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		configureHeaders(&w)
-
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-
-		} else if r.Method == "POST" {
-			adminPassword := os.Getenv("ADMIN_PASSWORD")
-
-			if adminPassword == "" {
-				w.WriteHeader(http.StatusInternalServerError)
-				resp, _ := json.Marshal(MessageResponse{"Could not handle request"})
-				w.Write(resp)
-
-				loggers.LogEnvError("ADMIN_PASSWORD")
-				return
-			}
-
-			data := PasswordBody{}
-			reqBody, _ := ioutil.ReadAll(r.Body)
-			json.Unmarshal(reqBody, &data)
-			providedPassword := data.Pwd
-
-			if providedPassword == "" {
-				w.WriteHeader(http.StatusBadRequest)
-				resp, _ := json.Marshal(MessageResponse{"Password was not provided"})
-				w.Write(resp)
-
-				loggers.LogRequestResult("POST", "auth_admin/", http.StatusBadRequest)
-			} else {
-				if adminPassword == providedPassword {
-					w.WriteHeader(http.StatusOK)
-					resp, _ := json.Marshal(MessageResponse{"OK"})
-					w.Write(resp)
-
-					loggers.LogRequestResult("POST", "auth_admin/", http.StatusOK)
-				} else {
-					w.WriteHeader(http.StatusUnauthorized)
-					resp, _ := json.Marshal(MessageResponse{"Wrong password"})
-					w.Write(resp)
-
-					loggers.LogRequestResult("POST", "auth_admin/", http.StatusUnauthorized)
-				}
-			}
-		}
 	}
 }
 
