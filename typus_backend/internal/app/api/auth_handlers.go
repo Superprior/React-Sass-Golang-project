@@ -133,6 +133,14 @@ func (s *APIserver) handleRegisterUser() http.HandlerFunc {
 	}
 }
 
+// @Summary Log in User
+// @Description Check user's name and email, validate the password and create JWT
+// @Tags Auth
+//
+// @Accept json
+// @Produce json
+// @Param data body apiserver.LoginBody true "Provided data for loggin a User in"
+// @Router /login [post]
 func (s *APIserver) handleLoginUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		configureHeaders(&w)
@@ -199,6 +207,15 @@ func (s *APIserver) handleLoginUser() http.HandlerFunc {
 			// Query the database
 
 			token, err := s.store.User().Login(user)
+
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				resp, _ := json.Marshal(map[string]string{"message": "Could not login with provided credentials"})
+				w.Write(resp)
+
+				loggers.LogRequestResult("POST", "login/", http.StatusBadRequest)
+				return
+			}
 
 			w.WriteHeader(http.StatusOK)
 			resp, _ := json.Marshal(map[string]string{"token": token})

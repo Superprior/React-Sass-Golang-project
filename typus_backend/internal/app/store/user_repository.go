@@ -63,8 +63,8 @@ func (r *UserRepository) CheckUniqueValue(name string, value string) (bool, erro
 func (r *UserRepository) Login(user *model.User) (string, error) {
 
 	/*
-		Find the requested user in db, check his/her credentials, make a JWT if everything's fine
-		If the password is incorrect or user doesn't exist, return error
+		Find the requested user in db, check his/her credentials, make a JWT if everything's fine.
+		If the password is incorrect or user doesn't exist, return error.
 	*/
 
 	// Check if username or email was provided, query the database
@@ -101,12 +101,62 @@ func (r *UserRepository) Login(user *model.User) (string, error) {
 		return "", err
 	}
 
-	/*
-		We need to INSERT the generated token to another db table here,
-		so we can keep track of the current user's token
+	err = r.RefreshToken(user.Username, new_token)
 
-		!IMPLEMENT THIS!
-	*/
+	if err != nil {
+		return "", err
+	}
 
 	return new_token, nil
+}
+
+func (r *UserRepository) RefreshToken(username string, token string) error {
+
+	/*
+		Refresh the token for the certain user. If a user does not have a row in the table,
+		create a new row with the token.
+	*/
+
+	// Create the query and hit the database
+
+	query := fmt.Sprintf("SELECT id FROM tokens WHERE username='%s';", username)
+
+	var id int
+	err := r.store.db.QueryRow(query).Scan(&id)
+
+	// Check if the user is logging in for the first time or there is was an actual error while querying
+
+	if err != nil {
+		if err != sql.ErrNoRows {
+			return err
+		} else {
+
+			// Create a new row with username and token
+
+			var inserted_id int
+			query = fmt.Sprintf("INSERT INTO tokens (username, token) VALUES ('%s', '%s') RETURNING id;", username, token)
+
+			err = r.store.db.QueryRow(query).Scan(&inserted_id)
+
+			if err != nil {
+				return err
+			} else {
+				return nil
+			}
+		}
+	} else {
+
+		// Update the token in the database
+
+		var updated_id int
+		query = fmt.Sprintf("UPDATE tokens SET token='%s' WHERE username='%s' RETURNING id;", token, username)
+
+		err = r.store.db.QueryRow(query).Scan(&updated_id)
+
+		if err != nil {
+			return err
+		} else {
+			return nil
+		}
+	}
 }

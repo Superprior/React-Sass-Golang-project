@@ -1,0 +1,5 @@
+CREATE TABLE tokens (
+    id BIGSERIAL NOT NULL PRIMARY KEY,
+    username VARCHAR(100) NOT NULL,
+    token VARCHAR(255) NOT NULL
+);
