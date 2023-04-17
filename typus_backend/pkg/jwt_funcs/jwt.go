@@ -1,4 +1,4 @@
-package jwt
+package jwt_funcs
 
 import (
 	"backend/pkg/loggers"
@@ -8,7 +8,7 @@ import (
 )
 
 func GenerateJWT(username string, email string, role int8) (string, error) {
-	token := jwt.New(jwt.SigningMethodEdDSA)
+	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 
 	claims["authorized"] = true
@@ -22,7 +22,8 @@ func GenerateJWT(username string, email string, role int8) (string, error) {
 		return "", nil
 	}
 
-	tokenString, err := token.SignedString(secretKey)
+	tokenString, err := token.SignedString([]byte(secretKey))
+
 	if err != nil {
 		return "", err
 	}

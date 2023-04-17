@@ -2,6 +2,7 @@ package store
 
 import (
 	"backend/internal/app/model"
+	"backend/pkg/jwt_funcs"
 	"database/sql"
 	"fmt"
 )
@@ -57,4 +58,55 @@ func (r *UserRepository) CheckUniqueValue(name string, value string) (bool, erro
 		}
 	}
 	return false, nil
+}
+
+func (r *UserRepository) Login(user *model.User) (string, error) {
+
+	/*
+		Find the requested user in db, check his/her credentials, make a JWT if everything's fine
+		If the password is incorrect or user doesn't exist, return error
+	*/
+
+	// Check if username or email was provided, query the database
+
+	var (
+		query            string
+		err              error
+		encrypted_pwd_db string
+	)
+
+	if user.Username == "" {
+		query = fmt.Sprintf("SELECT id, username, role, encrypted_pwd FROM users WHERE email='%s';", user.Email)
+		err = r.store.db.QueryRow(query).Scan(&user.ID, &user.Username, &user.Role, &encrypted_pwd_db)
+	} else {
+		query = fmt.Sprintf("SELECT id, email, role, encrypted_pwd FROM users WHERE username='%s';", user.Username)
+		err = r.store.db.QueryRow(query).Scan(&user.ID, &user.Email, &user.Role, &encrypted_pwd_db)
+	}
+
+	if err != nil {
+		return "", err
+	}
+
+	// Check if the password is correct
+
+	if user.EncryptedPwd != encrypted_pwd_db {
+		return "", fmt.Errorf("Incorrect password provided")
+	}
+
+	// Make and return a JWT
+
+	new_token, err := jwt_funcs.GenerateJWT(user.Username, user.Email, int8(user.Role))
+
+	if err != nil {
+		return "", err
+	}
+
+	/*
+		We need to INSERT the generated token to another db table here,
+		so we can keep track of the current user's token
+
+		!IMPLEMENT THIS!
+	*/
+
+	return new_token, nil
 }

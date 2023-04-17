@@ -42,7 +42,8 @@ func (s *APIserver) configureRouter() {
 	s.router.HandleFunc("/api/samples/", s.handleCreateSample()).Methods("POST", "OPTIONS")
 	s.router.HandleFunc("/api/samples/{id}", s.handleSampleInstance()).Methods("GET", "OPTIONS")
 	s.router.HandleFunc("/api/samples/{id}", s.handleDeleteSample()).Methods("DELETE", "OPTIONS")
-	s.router.HandleFunc("/api/register/", s.handleCreateUser()).Methods("OPTIONS", "POST")
+	s.router.HandleFunc("/api/register/", s.handleRegisterUser()).Methods("POST", "OPTIONS")
+	s.router.HandleFunc("/api/login/", s.handleLoginUser()).Methods("POST", "OPTIONS")
 	s.router.PathPrefix("/docs/").Handler(httpSwagger.WrapHandler)
 }
 

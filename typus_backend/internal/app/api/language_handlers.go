@@ -12,7 +12,6 @@ import (
 //
 // @Produce json
 // @Success 200 {array} model.Language
-// @Failure 500 {object} apiserver.MessageResponse "Could not query the request or encode JSON"
 // @Router /languages [get]
 func (s *APIserver) handleLanguagesList() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +25,7 @@ func (s *APIserver) handleLanguagesList() http.HandlerFunc {
 
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				resp, _ := json.Marshal(MessageResponse{"Could not query the request"})
+				resp, _ := json.Marshal(map[string]string{"message": "Could not query the request"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("GET", "languages", http.StatusInternalServerError)
@@ -37,7 +36,7 @@ func (s *APIserver) handleLanguagesList() http.HandlerFunc {
 
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				resp, _ := json.Marshal(MessageResponse{"Could not encode JSON"})
+				resp, _ := json.Marshal(map[string]string{"message": "Could not encode JSON"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("GET", "languages", http.StatusInternalServerError)

@@ -10,7 +10,15 @@ import (
 	"net/http"
 )
 
-func (s *APIserver) handleCreateUser() http.HandlerFunc {
+// @Summary Create User
+// @Description Create a new User instance with unique username and email
+// @Tags Auth
+//
+// @Accept json
+// @Produce json
+// @Param data body apiserver.RegisterBody true "Provided data for creating User"
+// @Router /register [post]
+func (s *APIserver) handleRegisterUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		configureHeaders(&w)
 
@@ -20,9 +28,11 @@ func (s *APIserver) handleCreateUser() http.HandlerFunc {
 		} else if r.Method == "POST" {
 
 			// Read the request's body
+
 			body, err := ioutil.ReadAll(r.Body)
 
 			// Handle errors while decoding body
+
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
 				resp, _ := json.Marshal(map[string]string{"message": "Invalid data provided"})
@@ -33,10 +43,12 @@ func (s *APIserver) handleCreateUser() http.HandlerFunc {
 			}
 
 			// Read the body JSON into an object
+
 			rb := RegisterBody{}
 			json.Unmarshal(body, &rb)
 
 			// Handle cases where any necessary data was not provided
+
 			if rb.Username == "" {
 				w.WriteHeader(http.StatusBadRequest)
 				resp, _ := json.Marshal(map[string]string{"message": "Username was not provided"})
@@ -117,6 +129,82 @@ func (s *APIserver) handleCreateUser() http.HandlerFunc {
 			w.WriteHeader(http.StatusCreated)
 			resp, _ := json.Marshal(map[string]int{"id": id})
 			w.Write(resp)
+		}
+	}
+}
+
+func (s *APIserver) handleLoginUser() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		configureHeaders(&w)
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+		} else if r.Method == "POST" {
+
+			// Read info from body
+
+			body, err := ioutil.ReadAll(r.Body)
+
+			// Handle errors while decoding body
+
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				resp, _ := json.Marshal(map[string]string{"message": "Invalid data provided"})
+				w.Write(resp)
+
+				loggers.LogRequestResult("POST", "login/", http.StatusBadRequest)
+				return
+			}
+
+			// Read the body JSON into an object
+
+			rb := LoginBody{}
+			json.Unmarshal(body, &rb)
+
+			// Handle cases where any necessary data was not provided
+
+			if rb.Username == "" && rb.Email == "" {
+				w.WriteHeader(http.StatusBadRequest)
+				resp, _ := json.Marshal(map[string]string{"message": "No password or email provided"})
+				w.Write(resp)
+
+				loggers.LogRequestResult("POST", "login/", http.StatusBadRequest)
+				return
+			}
+			if rb.Password == "" {
+				w.WriteHeader(http.StatusBadRequest)
+				resp, _ := json.Marshal(map[string]string{"message": "Password was not provided"})
+				w.Write(resp)
+
+				loggers.LogRequestResult("POST", "login/", http.StatusBadRequest)
+				return
+			}
+
+			// Encrypt the password
+
+			h := sha256.New()
+			h.Write([]byte(rb.Password))
+			encrypted_pwd := hex.EncodeToString(h.Sum(nil))
+
+			// Create object instance
+
+			user := &model.User{
+				ID:           0,
+				Username:     rb.Username,
+				Email:        rb.Email,
+				Role:         0,
+				EncryptedPwd: encrypted_pwd,
+			}
+
+			// Query the database
+
+			token, err := s.store.User().Login(user)
+
+			w.WriteHeader(http.StatusOK)
+			resp, _ := json.Marshal(map[string]string{"token": token})
+			w.Write(resp)
+
+			loggers.LogRequestResult("POST", "login/", http.StatusOK)
 		}
 	}
 }

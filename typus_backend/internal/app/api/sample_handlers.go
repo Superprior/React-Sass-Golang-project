@@ -17,7 +17,6 @@ import (
 //
 // @Produce json
 // @Success 200 {array} model.Sample
-// @Failure 500 {object} apiserver.MessageResponse "Could not query the request or encode JSON"
 // @Router /samples [get]
 func (s *APIserver) handleSamplesList() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -31,7 +30,7 @@ func (s *APIserver) handleSamplesList() http.HandlerFunc {
 
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				resp, _ := json.Marshal(MessageResponse{"Could not query the request"})
+				resp, _ := json.Marshal(map[string]string{"message": "Could not query the request"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("GET", "samples", http.StatusInternalServerError)
@@ -42,7 +41,7 @@ func (s *APIserver) handleSamplesList() http.HandlerFunc {
 
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				resp, _ := json.Marshal(MessageResponse{"Could not encode JSON"})
+				resp, _ := json.Marshal(map[string]string{"message": "Could not encode JSON"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("GET", "samples", http.StatusInternalServerError)
@@ -64,8 +63,6 @@ func (s *APIserver) handleSamplesList() http.HandlerFunc {
 // @Produce json
 // @Param id path int true "Sample ID"
 // @Success 200 {object} model.Sample
-// @Failure 400 {object} apiserver.MessageResponse "Invalid ID provided or no sample with such ID"
-// @Failure 500 {object} apiserver.MessageResponse "Could not encode JSON"
 // @Router /samples/{id} [get]
 func (s *APIserver) handleSampleInstance() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -81,7 +78,7 @@ func (s *APIserver) handleSampleInstance() http.HandlerFunc {
 
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
-				resp, _ := json.Marshal(MessageResponse{"Invalid sample ID provided"})
+				resp, _ := json.Marshal(map[string]string{"message": "Invalid sample ID provided"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("GET", fmt.Sprintf("samples/%s", strKey), http.StatusBadRequest)
@@ -92,7 +89,7 @@ func (s *APIserver) handleSampleInstance() http.HandlerFunc {
 
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
-				resp, _ := json.Marshal(MessageResponse{"No sample with such ID"})
+				resp, _ := json.Marshal(map[string]string{"message": "No sample with such ID"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("GET", fmt.Sprintf("samples/%d", intKey), http.StatusBadRequest)
@@ -103,7 +100,7 @@ func (s *APIserver) handleSampleInstance() http.HandlerFunc {
 
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				resp, _ := json.Marshal(MessageResponse{"Could not encode json"})
+				resp, _ := json.Marshal(map[string]string{"message": "Could not encode json"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("GET", fmt.Sprintf("samples/%d", intKey), http.StatusInternalServerError)
@@ -122,11 +119,9 @@ func (s *APIserver) handleSampleInstance() http.HandlerFunc {
 // @Description Create a new Sample instance
 // @Tags Sample
 //
+// @Accept json
 // @Produce json
 // @Param data body apiserver.PostSampleBody true "Provided data for creating Sample"
-// @Success 201 {object} apiserver.IdResponse "Returns id of the created Sample"
-// @Failure 400 {object} apiserver.MessageResponse "Invalid data provided"
-// @Failure 500 {object} apiserver.MessageResponse "Could not create Sample instance"
 // @Router /samples [post]
 func (s *APIserver) handleCreateSample() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -141,7 +136,7 @@ func (s *APIserver) handleCreateSample() http.HandlerFunc {
 
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
-				resp, _ := json.Marshal(MessageResponse{"Invalid data provided"})
+				resp, _ := json.Marshal(map[string]string{"message": "Invalid data provided"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("POST", "samples/", http.StatusBadRequest)
@@ -154,7 +149,7 @@ func (s *APIserver) handleCreateSample() http.HandlerFunc {
 
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				resp, _ := json.Marshal(MessageResponse{"Could not create sample instance"})
+				resp, _ := json.Marshal(map[string]string{"message": "Could not create sample instance"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("POST", "samples/", http.StatusInternalServerError)
@@ -162,7 +157,7 @@ func (s *APIserver) handleCreateSample() http.HandlerFunc {
 			}
 
 			w.WriteHeader(http.StatusCreated)
-			resp, _ := json.Marshal(IdResponse{id})
+			resp, _ := json.Marshal(map[string]int{"id": id})
 			w.Write(resp)
 
 			loggers.LogRequestResult("POST", fmt.Sprintf("samples/%d", id), http.StatusCreated)
@@ -176,9 +171,6 @@ func (s *APIserver) handleCreateSample() http.HandlerFunc {
 //
 // @Produce json
 // @Param id path int true "Sample ID"
-// @Success 200 {object} apiserver.IdResponse "Returns id of the deleted Sample"
-// @failure 400 {object} apiserver.MessageResponse "invalid id provided"
-// @failure 500 {object} apiserver.MessageResponse "Could not delete Sample instance"
 // @Router /samples/{id} [delete]
 func (s *APIserver) handleDeleteSample() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -194,7 +186,7 @@ func (s *APIserver) handleDeleteSample() http.HandlerFunc {
 
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
-				resp, _ := json.Marshal(MessageResponse{"Invalid ID provided"})
+				resp, _ := json.Marshal(map[string]string{"message": "Invalid ID provided"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("DELETE", fmt.Sprintf("samples/%s", strKey), http.StatusBadRequest)
@@ -205,7 +197,7 @@ func (s *APIserver) handleDeleteSample() http.HandlerFunc {
 
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				resp, _ := json.Marshal(MessageResponse{"Could not delete sample instance"})
+				resp, _ := json.Marshal(map[string]string{"message": "Could not delete sample instance"})
 				w.Write(resp)
 
 				loggers.LogRequestResult("DELETE", fmt.Sprintf("samples/%s", strKey), http.StatusInternalServerError)
@@ -213,7 +205,7 @@ func (s *APIserver) handleDeleteSample() http.HandlerFunc {
 			}
 
 			w.WriteHeader(http.StatusOK)
-			resp, _ := json.Marshal(IdResponse{intKey})
+			resp, _ := json.Marshal(map[string]int{"id": intKey})
 			w.Write(resp)
 
 			loggers.LogRequestResult("DELETE", fmt.Sprintf("samples/%s", strKey), http.StatusOK)
