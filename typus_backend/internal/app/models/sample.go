@@ -1,4 +1,4 @@
-package model
+package models
 
 type Sample struct {
 	ID       int

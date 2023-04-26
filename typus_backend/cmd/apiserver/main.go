@@ -3,10 +3,8 @@ package main
 import (
 	"backend/internal/app/apiserver"
 	"log"
-	"net/http"
 	"os"
 
-	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
@@ -21,10 +19,6 @@ func main() {
 
 	// Create new APIServer
 	s := apiserver.NewAPIServer()
-
-	s.Server.POST("/api/login", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{"status": "OK!"})
-	})
 
 	// Get port number from the .env file
 	serverPort := os.Getenv("BACKEND_PORT")
