@@ -2,32 +2,40 @@ package store
 
 import (
 	"database/sql"
+	"fmt"
 
 	_ "github.com/lib/pq"
 )
 
 type Store struct {
-	db *sql.DB
+	DB     *sql.DB
+	Config *Config
 }
 
-// func (s *Store) Open() error {
-// 	dbConnectionString := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=%s",
-// 		s.config.DatabaseHost, s.config.DatabasePort, s.config.DatabaseName,
-// 		s.config.DatabaseUser, s.config.DatabasePassword, s.config.DatabaseSSLMode)
+func New(config *Config) *Store {
+	return &Store{
+		Config: config,
+	}
+}
 
-// 	db, err := sql.Open("postgres", dbConnectionString)
-// 	if err != nil {
-// 		return err
-// 	}
+func (s *Store) Open() error {
+	dbConnectionString := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=%s",
+		s.Config.Host, s.Config.Port, s.Config.Name,
+		s.Config.User, s.Config.Password, s.Config.SSLMode)
 
-// 	if err := db.Ping(); err != nil {
-// 		return err
-// 	}
+	db, err := sql.Open("postgres", dbConnectionString)
+	if err != nil {
+		return err
+	}
 
-// 	s.db = db
-// 	return nil
-// }
+	if err := db.Ping(); err != nil {
+		return err
+	}
+
+	s.DB = db
+	return nil
+}
 
 func (s *Store) Close() {
-	s.db.Close()
+	s.DB.Close()
 }

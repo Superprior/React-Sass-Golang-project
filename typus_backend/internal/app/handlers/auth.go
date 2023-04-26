@@ -3,13 +3,20 @@ package handlers
 import (
 	"backend/internal/app/models"
 	"backend/internal/app/usecases"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 type AuthHandler struct {
-	UseCase usecases.AuthUsecase
+	UseCase *usecases.AuthUsecase
+}
+
+func NewAuthHandler() *AuthHandler {
+	return &AuthHandler{
+		UseCase: usecases.NewAuthUsecase(),
+	}
 }
 
 func (h *AuthHandler) Routes(g *gin.RouterGroup) {
@@ -26,6 +33,8 @@ func (h *AuthHandler) RegisterUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"Error": "Could not decode the request",
 		})
+		fmt.Println(err.Error())
+		return
 	}
 
 	// Check if all the necessary data was provided
