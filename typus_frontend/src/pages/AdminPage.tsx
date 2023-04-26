@@ -47,7 +47,7 @@ function AdminPage(props: Props): JSX.Element {
         const { title_, content } = document.forms[0];
 
         const created = await postCodeSample({ title: title_.value, langSlug: 'py', content: content.value });
-        if (created == true) {
+        if (created === true) {
             // handle this...
         } else {
             // and handle errors...

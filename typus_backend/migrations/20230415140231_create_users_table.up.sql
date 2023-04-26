@@ -1,7 +1,0 @@
-CREATE TABLE users (
-    id BIGSERIAL NOT NULL PRIMARY KEY,
-    username VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL,
-    role SMALLINT NOT NULL,
-    encrypted_pwd VARCHAR(255) NOT NULL
-);
