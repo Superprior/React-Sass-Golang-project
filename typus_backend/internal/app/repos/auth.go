@@ -32,14 +32,26 @@ func NewAuthRepo() (*AuthRepo, error) {
 // This function creates a new user in the database using provided data.
 func (r *AuthRepo) CreateUser(user *models.User) (*models.User, error) {
 
+	// Firstly check if a user with the same username/email already exists.
+	// This error cannot be handled after the insert is done, so the select query
+	// needs to be executed in the first place.
+
+	var id int
+	query := fmt.Sprintf("SELECT id FROM users WHERE username='%s' OR email='%s'", user.Username, user.Email)
+	err := r.store.DB.QueryRow(query).Scan(&id)
+
+	if err != sql.ErrNoRows {
+		return nil, fmt.Errorf("User with the same username or email already exists")
+	}
+
 	// Create the query
-	query := fmt.Sprintf(
+	query = fmt.Sprintf(
 		"INSERT INTO users (username, email, role, encrypted_pwd) VALUES ('%s', '%s', %d, '%s') RETURNING id;",
 		user.Username, user.Email, user.Role, user.EncryptedPwd,
 	)
 
 	// Perform the query and get the id
-	err := r.store.DB.QueryRow(query).Scan(&user.ID)
+	err = r.store.DB.QueryRow(query).Scan(&user.ID)
 
 	if err != nil {
 		return nil, err

@@ -8,14 +8,14 @@ import (
 
 type APIServer struct {
 	Server        *gin.Engine
-	AuthHandler   *handlers.AuthHandler
-	SampleHandler *handlers.SampleHandler
+	AuthHandler   *handlers.Handler
+	SampleHandler *handlers.Handler
 	// logger *logger.Logger
 }
 
 func NewAPIServer() *APIServer {
 	server := gin.Default()
-	authHandler := handlers.NewAuthHandler()
+	var authHandler handlers.Handler = handlers.NewAuthHandler()
 	// sampleHandler := handlers.NewSampleHandler()
 
 	api := server.Group("/api")
@@ -26,7 +26,7 @@ func NewAPIServer() *APIServer {
 
 	return &APIServer{
 		Server:      server,
-		AuthHandler: authHandler,
+		AuthHandler: &authHandler,
 		// SampleHandler: sampleHandler,
 	}
 }
