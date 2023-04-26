@@ -77,5 +77,47 @@ func (h *AuthHandler) RegisterUser(ctx *gin.Context) {
 }
 
 func (h *AuthHandler) LoginUser(ctx *gin.Context) {
-	// call usecase
+
+	var logBody models.LoginCredentials
+
+	// Read the request's body
+	if err := ctx.BindJSON(&logBody); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"Error": "Could not decode the request",
+		})
+		fmt.Println(err.Error())
+		return
+	}
+
+	// Check if all the necessary data was provided
+
+	if logBody.Email == "" && logBody.Username == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"Error": "Email or Username was not provided",
+		})
+		return
+	}
+	if logBody.Password == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"Error": "Password was not provided",
+		})
+		return
+	}
+
+	// Call the usecase
+
+	token, err := h.UseCase.LoginUser(logBody)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+
+	// Return id of the created user
+
+	ctx.JSON(http.StatusCreated, gin.H{
+		"token": token,
+	})
 }

@@ -3,6 +3,7 @@ package repos
 import (
 	"backend/internal/app/models"
 	"backend/internal/app/store"
+	"database/sql"
 	"fmt"
 )
 
@@ -37,4 +38,36 @@ func (r *AuthRepo) CreateUser(user *models.User) (*models.User, error) {
 	}
 
 	return user, nil
+}
+
+func (r *AuthRepo) GetUserByEmail(email string) (*models.User, error) {
+
+	query := fmt.Sprintf("SELECT id, username, email, role, encrypted_pwd FROM users WHERE email='%s'", email)
+	var user models.User
+
+	err := r.store.DB.QueryRow(query).Scan(&user.ID, &user.Username, &user.Email, &user.Role, &user.EncryptedPwd)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("No user with such email")
+		}
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (r *AuthRepo) GetUserByUsername(username string) (*models.User, error) {
+
+	query := fmt.Sprintf("SELECT id, username, email, role, encrypted_pwd FROM users WHERE username='%s'", username)
+	var user models.User
+
+	err := r.store.DB.QueryRow(query).Scan(&user.ID, &user.Username, &user.Email, &user.Role, &user.EncryptedPwd)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("No user with such username")
+		}
+		return nil, err
+	}
+	return &user, nil
 }

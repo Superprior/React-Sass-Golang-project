@@ -1,7 +1,6 @@
 package jwt_funcs
 
 import (
-	"backend/pkg/loggers"
 	"fmt"
 	"os"
 
@@ -24,7 +23,6 @@ func ValidateJWT(tokenString string) (*Claims, error) {
 	claims := jwt.MapClaims{}
 	secretKey := os.Getenv("JWT_KEY")
 	if secretKey == "" {
-		loggers.LogEnvError("JWT_KEY")
 		return nil, fmt.Errorf("Could not get access the secret key.")
 	}
 

@@ -1,7 +1,6 @@
 package jwt_funcs
 
 import (
-	"backend/pkg/loggers"
 	"os"
 
 	"github.com/golang-jwt/jwt"
@@ -18,7 +17,6 @@ func GenerateJWT(username string, email string, role int8) (string, error) {
 
 	secretKey := os.Getenv("JWT_KEY")
 	if secretKey == "" {
-		loggers.LogEnvError("JWT_KEY")
 		return "", nil
 	}
 

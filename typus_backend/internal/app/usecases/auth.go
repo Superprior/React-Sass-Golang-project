@@ -3,8 +3,10 @@ package usecases
 import (
 	"backend/internal/app/models"
 	"backend/internal/app/repos"
+	"backend/pkg/jwt_funcs"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"log"
 )
 
@@ -45,6 +47,31 @@ func (u *AuthUsecase) RegisterUser(creds models.RegisterCredentials) (id int, er
 	return user.ID, nil
 }
 
-func (u *AuthUsecase) LoginUser(creds models.LoginCredentials) (role int8, err error) {
-	return 1, nil
+func (u *AuthUsecase) LoginUser(creds models.LoginCredentials) (token string, err error) {
+	var user *models.User
+
+	if creds.Email == "" {
+		user, err = u.repo.GetUserByUsername(creds.Username)
+	} else {
+		user, err = u.repo.GetUserByEmail(creds.Email)
+	}
+
+	if err != nil {
+		return "", err
+	}
+
+	h := sha256.New()
+	h.Write([]byte(creds.Password))
+	creds_encrypted_pwd := hex.EncodeToString(h.Sum(nil))
+
+	if user.EncryptedPwd == creds_encrypted_pwd {
+		token, err := jwt_funcs.GenerateJWT(user.Username, user.Email, int8(user.Role))
+		if err != nil {
+			return "", err
+		}
+
+		return token, nil
+	} else {
+		return "", fmt.Errorf("Incorrect password provided")
+	}
 }
