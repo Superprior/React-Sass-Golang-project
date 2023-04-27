@@ -3,6 +3,7 @@ package handlers
 import (
 	"backend/internal/app/models"
 	"backend/internal/app/usecases"
+	"backend/internal/pkg/headers"
 	"fmt"
 	"net/http"
 
@@ -28,12 +29,17 @@ func NewAuthHandler() *AuthHandler {
 func (h *AuthHandler) Routes(g *gin.RouterGroup) {
 	g.POST("/register/", h.handleRegister)
 	g.POST("/login/", h.handleLogin)
+
+	g.OPTIONS("/register/", handleOptions)
+	g.OPTIONS("/login/", handleOptions)
 }
 
 // RegisterUser
 // This function implements handler for the /api/auth/register/ API endpoint.
 // Register a new user with unique username and email.
 func (h *AuthHandler) handleRegister(ctx *gin.Context) {
+
+	headers.DefaultHeaders(ctx, "POST")
 
 	var regBody models.RegisterCredentials
 
@@ -89,6 +95,8 @@ func (h *AuthHandler) handleRegister(ctx *gin.Context) {
 // This function implements handler for the /api/auth/login/ API endpoint.
 // Log in the user with the provided credentials, generate a JWT.
 func (h *AuthHandler) handleLogin(ctx *gin.Context) {
+
+	headers.DefaultHeaders(ctx, "POST")
 
 	var logBody models.LoginCredentials
 

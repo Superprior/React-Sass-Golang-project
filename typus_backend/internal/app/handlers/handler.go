@@ -1,7 +1,15 @@
 package handlers
 
-import "github.com/gin-gonic/gin"
+import (
+	"backend/internal/pkg/headers"
+
+	"github.com/gin-gonic/gin"
+)
 
 type Handler interface {
 	Routes(g *gin.RouterGroup)
+}
+
+func handleOptions(ctx *gin.Context) {
+	headers.DefaultHeaders(ctx, "OPTIONS")
 }

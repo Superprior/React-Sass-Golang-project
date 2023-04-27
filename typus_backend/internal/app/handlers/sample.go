@@ -3,6 +3,7 @@ package handlers
 import (
 	"backend/internal/app/models"
 	"backend/internal/app/usecases"
+	"backend/internal/pkg/headers"
 	"backend/pkg/jwt_funcs"
 	"fmt"
 	"net/http"
@@ -26,9 +27,14 @@ func (h *SampleHandler) Routes(g *gin.RouterGroup) {
 	g.GET("", h.handleSamplesList)
 	g.GET("/:sampleId", h.handleGetSample)
 	g.POST("", h.handleCreateSample)
+
+	g.OPTIONS("", handleOptions)
+	g.OPTIONS("/:sampleId", handleOptions)
 }
 
 func (h *SampleHandler) handleSamplesList(ctx *gin.Context) {
+
+	headers.DefaultHeaders(ctx, "GET")
 
 	// Access level: 0 (guest)
 	// No need to check the JWT in this handler
@@ -46,6 +52,8 @@ func (h *SampleHandler) handleSamplesList(ctx *gin.Context) {
 }
 
 func (h *SampleHandler) handleGetSample(ctx *gin.Context) {
+
+	headers.DefaultHeaders(ctx, "GET")
 
 	// Access level: 0 (guest)
 	// No need to check the JWT in this handler
@@ -73,6 +81,8 @@ func (h *SampleHandler) handleGetSample(ctx *gin.Context) {
 }
 
 func (h *SampleHandler) handleCreateSample(ctx *gin.Context) {
+
+	headers.DefaultHeaders(ctx, "POST")
 
 	// Access level: 2 (moderator)
 

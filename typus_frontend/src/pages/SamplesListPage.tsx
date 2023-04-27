@@ -24,6 +24,7 @@ function SamplesPage(props: Props): JSX.Element {
                             <div 
                                 style={{ marginBottom: '20px', backgroundColor: 'gray', width: '500px', cursor: 'pointer' }}
                                 onClick={() => window.location.replace(`${process.env.REACT_APP_PROTOCOL}://${process.env.REACT_APP_HOSTNAME}:3000/samples/${card.sampleId}`)}
+                                key={card.sampleId}
                             >
                                 <div style={{ display: 'flex' }}>
                                     <p>{ card.sampleId }</p>

@@ -5,17 +5,12 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import SamplesListPage from './pages/SamplesListPage';
 import SamplePage from './pages/SamplePage';
 import AdminPage from './pages/AdminPage';
-import RegisterPage from './pages/RegisterPage';
 
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <IndexPage/>
-  },
-  {
-    path: '/register',
-    element: <RegisterPage />
   },
   {
     path: '/samples',

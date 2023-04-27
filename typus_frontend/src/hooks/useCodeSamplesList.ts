@@ -24,7 +24,7 @@ function useCodeSamplesList(): FetchState<SampleCard[]> {
                     const cards: SampleCard[] = []
 
                     for (let i = 0; i < samples.length; i++) {
-                        cards.push({ sampleId: samples[i].ID.toString(), title: samples[i].Title, langSlug: samples[i].LangSlug })
+                        cards.push({ sampleId: samples[i].ID.toString(), title: samples[i].Title, langSlug: samples[i].Language })
                     }
                     setState({ status: 'success', data: cards, error: null })
                 } else {
