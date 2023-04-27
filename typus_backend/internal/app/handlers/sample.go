@@ -28,11 +28,16 @@ func (h *SampleHandler) handleSamplesList(ctx *gin.Context) {
 
 	// No need to check the JWT in this handler
 
-	// items, err := h.UseCase.GetAllSamples()
+	samples, err := h.UseCase.GetAllSamples()
 
-	// if err != nil {
-	// errors
-	// }
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, samples)
 }
 
 func (h *SampleHandler) handleGetSample(ctx *gin.Context) {

@@ -24,17 +24,46 @@ func NewSampleRepo() (*SampleRepo, error) {
 	}, nil
 }
 
-func (r *SampleRepo) GetList() {
+func (r *SampleRepo) GetList() ([]*models.Sample, error) {
 
+	// Use GetInstanceById function for every ID to avoid nesting
+
+	query := fmt.Sprintf("SELECT id FROM code_samples;")
+
+	rows, err := r.store.DB.Query(query)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var samples []*models.Sample
+
+	for rows.Next() {
+		var id int
+
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+
+		sample, err := r.GetInstanceById(id)
+		if err != nil {
+			return nil, err
+		}
+		samples = append(samples, sample)
+	}
+
+	return samples, nil
 }
 
 func (r *SampleRepo) GetInstanceById(id int) (*models.Sample, error) {
 
 	// Perform select query to check if the instance with that id exists
 
+	var _id int
 	query := fmt.Sprintf("SELECT id FROM code_samples WHERE id=%d;", id)
 
-	err := r.store.DB.QueryRow(query).Scan()
+	err := r.store.DB.QueryRow(query).Scan(&_id)
 
 	if err != nil {
 		if err == sql.ErrNoRows {

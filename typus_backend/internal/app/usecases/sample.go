@@ -22,7 +22,12 @@ func NewSampleUsecase() *SampleUsecase {
 }
 
 func (u *SampleUsecase) GetAllSamples() ([]*models.Sample, error) {
-	return nil, nil
+	samples, err := u.repo.GetList()
+
+	if err != nil {
+		return nil, err
+	}
+	return samples, nil
 }
 
 func (u *SampleUsecase) GetSampleById(id int) (*models.Sample, error) {
