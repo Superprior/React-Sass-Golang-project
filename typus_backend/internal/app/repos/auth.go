@@ -30,7 +30,7 @@ func NewAuthRepo() (*AuthRepo, error) {
 
 // CreateUser
 // This function creates a new user in the database using provided data.
-func (r *AuthRepo) CreateUser(user *models.User) (*models.User, error) {
+func (r *AuthRepo) CreateInstance(user *models.User) (*models.User, error) {
 
 	// Firstly check if a user with the same username/email already exists.
 	// This error cannot be handled after the insert is done, so the select query
@@ -63,7 +63,7 @@ func (r *AuthRepo) CreateUser(user *models.User) (*models.User, error) {
 
 // GetUserByEmail
 // This function get the user from the database by the provided email.
-func (r *AuthRepo) GetUserByEmail(email string) (*models.User, error) {
+func (r *AuthRepo) GetInstanceByEmail(email string) (*models.User, error) {
 
 	// Create the query
 	query := fmt.Sprintf("SELECT id, username, email, role, encrypted_pwd FROM users WHERE email='%s'", email)
@@ -83,7 +83,7 @@ func (r *AuthRepo) GetUserByEmail(email string) (*models.User, error) {
 
 // GetUserByEmail
 // This function get the user from the database by the provided email.
-func (r *AuthRepo) GetUserByUsername(username string) (*models.User, error) {
+func (r *AuthRepo) GetInstanceByUsername(username string) (*models.User, error) {
 
 	// Create the query
 	query := fmt.Sprintf("SELECT id, username, email, role, encrypted_pwd FROM users WHERE username='%s'", username)

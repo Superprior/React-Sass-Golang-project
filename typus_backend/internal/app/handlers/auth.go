@@ -26,14 +26,14 @@ func NewAuthHandler() *AuthHandler {
 // Routes
 // This functions defines all the auth API endpoints.
 func (h *AuthHandler) Routes(g *gin.RouterGroup) {
-	g.POST("/register/", h.RegisterUser)
-	g.POST("/login/", h.LoginUser)
+	g.POST("/register/", h.handleRegister)
+	g.POST("/login/", h.handleLogin)
 }
 
 // RegisterUser
 // This function implements handler for the /api/auth/register/ API endpoint.
 // Register a new user with unique username and email.
-func (h *AuthHandler) RegisterUser(ctx *gin.Context) {
+func (h *AuthHandler) handleRegister(ctx *gin.Context) {
 
 	var regBody models.RegisterCredentials
 
@@ -88,7 +88,7 @@ func (h *AuthHandler) RegisterUser(ctx *gin.Context) {
 // LoginUser
 // This function implements handler for the /api/auth/login/ API endpoint.
 // Log in the user with the provided credentials, generate a JWT.
-func (h *AuthHandler) LoginUser(ctx *gin.Context) {
+func (h *AuthHandler) handleLogin(ctx *gin.Context) {
 
 	var logBody models.LoginCredentials
 

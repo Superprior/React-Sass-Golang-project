@@ -16,18 +16,18 @@ type APIServer struct {
 func NewAPIServer() *APIServer {
 	server := gin.Default()
 	var authHandler handlers.Handler = handlers.NewAuthHandler()
-	// sampleHandler := handlers.NewSampleHandler()
+	var sampleHandler handlers.Handler = handlers.NewSampleHandler()
 
 	api := server.Group("/api")
 	{
 		authHandler.Routes(api.Group("/auth"))
-		// sampleHandler.Routes(api.Group("/samples"))
+		sampleHandler.Routes(api.Group("/samples"))
 	}
 
 	return &APIServer{
-		Server:      server,
-		AuthHandler: &authHandler,
-		// SampleHandler: sampleHandler,
+		Server:        server,
+		AuthHandler:   &authHandler,
+		SampleHandler: &sampleHandler,
 	}
 }
 

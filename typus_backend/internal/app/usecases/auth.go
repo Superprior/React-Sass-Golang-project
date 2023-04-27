@@ -48,7 +48,7 @@ func (u *AuthUsecase) RegisterUser(creds models.RegisterCredentials) (id int, er
 	}
 
 	// Call the repo method to insert the instance into the database
-	user, err = u.repo.CreateUser(user)
+	user, err = u.repo.CreateInstance(user)
 
 	if err != nil {
 		return 0, err
@@ -65,9 +65,9 @@ func (u *AuthUsecase) LoginUser(creds models.LoginCredentials) (token string, er
 
 	// Determine if username of email was provided
 	if creds.Email == "" {
-		user, err = u.repo.GetUserByUsername(creds.Username)
+		user, err = u.repo.GetInstanceByUsername(creds.Username)
 	} else {
-		user, err = u.repo.GetUserByEmail(creds.Email)
+		user, err = u.repo.GetInstanceByEmail(creds.Email)
 	}
 
 	if err != nil {
