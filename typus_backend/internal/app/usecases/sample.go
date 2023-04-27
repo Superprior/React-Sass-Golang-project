@@ -40,3 +40,14 @@ func (u *SampleUsecase) GetSampleById(id int) (*models.Sample, error) {
 
 	return sample, nil
 }
+
+func (u *SampleUsecase) CreateSample(sample *models.Sample) (*models.Sample, error) {
+
+	sample, err := u.repo.CreateInstance(sample)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return sample, nil
+}

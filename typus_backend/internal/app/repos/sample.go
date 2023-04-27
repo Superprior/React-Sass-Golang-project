@@ -108,6 +108,33 @@ func (r *SampleRepo) GetInstanceById(id int) (*models.Sample, error) {
 	return &sample, nil
 }
 
-func (r *SampleRepo) CreateInstance() {
+func (r *SampleRepo) CreateInstance(sample *models.Sample) (*models.Sample, error) {
 
+	// Create postgres representation of the array to insert
+
+	linesString := "["
+
+	for i, line := range sample.Content {
+		linesString += "'" + line + "'"
+		if i != len(sample.Content)-1 {
+			linesString += ", "
+		}
+	}
+	linesString += "]"
+
+	// Perform the insert
+
+	query := fmt.Sprintf(
+		"INSERT INTO code_samples (title, content, language) VALUES ('%s', ARRAY%s, '%s') RETURNING id;",
+		sample.Title, linesString, sample.Language,
+	)
+
+	// Get the created sample's id and check for errors
+	err := r.store.DB.QueryRow(query).Scan(&sample.ID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return sample, nil
 }

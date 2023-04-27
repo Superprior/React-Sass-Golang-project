@@ -8,10 +8,10 @@ import (
 )
 
 type Claims struct {
-	authorized bool
-	username   string
-	email      string
-	role       int8
+	Authorized bool
+	Username   string
+	Email      string
+	Role       int8
 }
 
 func ValidateJWT(tokenString string) (*Claims, error) {
@@ -53,17 +53,16 @@ func ValidateJWT(tokenString string) (*Claims, error) {
 	}
 
 	// Convert ROLE claim into int8
-
-	extractedRole, ok := claims["role"].(int)
+	extractedRole := claims["role"].(float64)
 	role := int8(extractedRole)
 
 	// Construct an object and return it
 
 	extractedClaims := Claims{
-		authorized: authorized,
-		username:   username,
-		email:      email,
-		role:       role,
+		Authorized: authorized,
+		Username:   username,
+		Email:      email,
+		Role:       role,
 	}
 
 	return &extractedClaims, nil
