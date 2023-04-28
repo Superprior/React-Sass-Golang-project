@@ -12,14 +12,24 @@ function Header(): JSX.Element {
                     Typus
                 </h1>
             </a>
-            <button
-                onClick={() => window.location.replace(`${process.env.REACT_APP_PROTOCOL}://${process.env.REACT_APP_HOSTNAME}:3000/register/`)}
-                className='register-button'
-            >
-                <h1 className='register-button-text'>
-                    Register
-                </h1>
-            </button>
+            <div className='header-buttons'>
+                <button
+                onClick={() => {}}
+                    className='header-button'
+                >
+                    <h1 className='header-button-text'>
+                        sign in
+                    </h1>
+                </button>
+                <button
+                onClick={() => {}}
+                    className='header-button'
+                >
+                    <h1 className='header-button-text'>
+                        register
+                    </h1>
+                </button>
+            </div>
         </div>
     );
 }

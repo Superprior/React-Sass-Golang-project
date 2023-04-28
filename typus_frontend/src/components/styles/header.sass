@@ -1,34 +1,51 @@
 @import "../../global"
 
+// Wrappers
+
 .header-wrapper
     box-sizing: border-box
     display: flex
     justify-content: space-between
-    background-color: $header-color
-    height: 46px
-    padding: 8px
+    height: 50px
+    padding: 10px 20px
+
+// Logo
 
 .logo-button
     margin: 0
     text-decoration: none
     display: block
-    width: fit-content
 
 .logo-text
     color: $text-color
     margin: 0
     border: 0
     font-weight: 600
-    line-height: 24px
+    font-family: $font-exo
+    text-transform: uppercase
+    font-size: 32px
+    line-height: 32px
 
-.register-button
-    margin: 0
+// Buttons
+
+.header-button
+    height: 30px
+    padding: 3px 12px
+    margin-left: 12px
     border: 0
-    background-color: rgba(0, 0, 0, 0)
+    background-color: $invisible
     cursor: pointer
+    transition-duration: .25s
     
-.register-button-text
+.header-button:hover
+    background-color: $header-button-hover-color
+    box-shadow: 0px 5px 10px 2px $header-button-hover-color
+    border-radius: 999rem
+
+.header-button-text
     margin: 0
+    font-family: $font-urbanist
+    text-transform: uppercase
     color: $text-color
-    line-height: 24px
     font-weight: 500
+    font-size: 24px
