@@ -1,12 +1,19 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import './styles/header.sass'
 import RegisterWindow from './RegisterWindow'
 import SignInWindow from './SignInWindow';
 
 		
 function Header(): JSX.Element {
-	const [isSignInWindowOpened, setIsSignInWindowOpened] = useState(false);
-	const [isRegisterWindowOpened, setIsRegisterWindowOpened] = useState(false);
+	const [isSignInWindowOpened, setIsSignInWindowOpened] = useState<boolean>(false);
+	const [isRegisterWindowOpened, setIsRegisterWindowOpened] = useState<boolean>(false);
+	const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+
+	useEffect(() => {
+		if (localStorage.getItem("token") !== null) {
+			setIsLoggedIn(true);
+		} 
+	}, []);
 
     return (
 		<div className='page'>
@@ -26,22 +33,35 @@ function Header(): JSX.Element {
 					</h1>
 				</a>
 				<div className='header-buttons'>
-					<button
-						onClick={() => setIsSignInWindowOpened(true)}
-						className='header-button'
-					>
-						<h1 className='header-button-text'>
-							SIGN IN
-						</h1>
-					</button>
-					<button
-						onClick={() => setIsRegisterWindowOpened(true)}
-						className='header-button'
-					>
-						<h1 className='header-button-text'>
-							REGISTER
-						</h1>
-					</button>
+					{ isLoggedIn ? (
+						<button
+							onClick={() => { localStorage.removeItem("token"); window.location.reload(); }}
+							className='header-button' 
+						>
+							<h1 className='header-button-text'>
+								LOG OUT
+							</h1>
+						</button>
+					) : (
+						<div style={{ display: 'flex' }}>
+							<button
+								onClick={() => setIsSignInWindowOpened(true)}
+								className='header-button'
+							>
+								<h1 className='header-button-text'>
+									SIGN IN
+								</h1>
+							</button>
+							<button
+								onClick={() => setIsRegisterWindowOpened(true)}
+								className='header-button'
+							>
+								<h1 className='header-button-text'>
+									REGISTER
+								</h1>
+							</button>
+						</div>
+					)}
 				</div>
 			</div>
 		</div>
