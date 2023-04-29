@@ -1,12 +1,38 @@
 
+// FONTS
+
 @import url('https://fonts.googleapis.com/css2?family=Exo:wght@100;200;300;400;500;700&family=Urbanist:wght@100;200;300;400;500&display=swap')
+
 $font-urbanist: 'Urbanist', sans-serif
 $font-exo: 'Exo', sans-serif
+
+// COLORS
 
 $header-color: #292929
 $sidebars-color: #202020
 $bg-color: #1A1A1A
+$blur-color: rgba(0, 0, 0, 0.25)
 $icons-color: #B9B9B9
-$text-color: #bebebe
-$header-button-hover-color: rgba(50, 50, 50, 0.75)
+$text-color: #b3b3b3
+$header-button-color-hover: rgba(50, 50, 50, 1)
+$header-button-color: rgba(50, 50, 50, 0.6)
+$windows-color: $header-color
 $invisible: rgba(0, 0, 0, 0)
+ 
+$window-grad: $header-color, $bg-color
+
+// ANIMATIONS 
+
+@keyframes slideDown
+    0%
+        top: 0px
+        opacity: 0
+    100%
+        top: calc(100vh / 2 - 240px)
+        opacity: 1
+
+// MIXINS
+
+@mixin window-gradient()
+    background-color: $header-color
+    background: linear-gradient(120deg, $header-color, $sidebars-color)

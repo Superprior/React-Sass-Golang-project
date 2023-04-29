@@ -1,0 +1,49 @@
+
+@import '../../_global'
+
+// Bachground
+
+.dark-bg
+    position: absolute
+    margin: 0
+    width: 100vw
+    height: 100vh
+    background-color: $blur-color
+    z-index: 100
+    animation: fadeIn .25s
+
+@keyframes fadeIn
+    0%
+        opacity: 0        
+    100%
+        opacity: 1
+
+// Wrappers
+
+.signin-wrapper
+    text-align: center
+    padding: 20px 10px
+    position: absolute
+    border-radius: 2rem
+    left: calc(100vw / 2 - 180px)
+    top: calc(100vh / 2 - 240px)
+    width: 360px
+    height: 480px
+    box-shadow: 2px 5px 10px 0px rgba(0, 0, 0, 0.5)
+    animation: slideDown .5s
+    box-sizing: border-box
+
+    @include window-gradient()
+
+.login-text
+    color: $text-color
+    font-family: $font-exo
+    margin: 0
+
+.login-form
+    position: relative
+
+.form-field
+    outline: none
+    border-radius: 0.5rem
+    border: none

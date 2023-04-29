@@ -137,7 +137,7 @@ func (h *AuthHandler) handleLogin(ctx *gin.Context) {
 
 	// Return id of the created user
 
-	ctx.JSON(http.StatusCreated, gin.H{
+	ctx.JSON(http.StatusOK, gin.H{
 		"token": token,
 	})
 }

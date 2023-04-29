@@ -2,24 +2,27 @@
 
 // Wrappers
 
+.page
+    margin: 0
+    padding: 0
+    border: 0
+
 .header-wrapper
-    box-sizing: border-box
-    display: flex
-    justify-content: space-between
     height: 50px
     padding: 10px 20px
+    
+    position: relative
+    display: flex
+    justify-content: space-between
 
 // Logo
 
 .logo-button
-    margin: 0
     text-decoration: none
-    display: block
 
 .logo-text
-    color: $text-color
     margin: 0
-    border: 0
+    color: $text-color
     font-weight: 600
     font-family: $font-exo
     text-transform: uppercase
@@ -30,17 +33,17 @@
 
 .header-button
     height: 30px
-    padding: 3px 12px
+    padding: 5px 12px 7px
     margin-left: 12px
     border: 0
-    background-color: $invisible
+    background-color: $header-button-color
     cursor: pointer
+    border-radius: 999rem
     transition-duration: .25s
     
 .header-button:hover
-    background-color: $header-button-hover-color
-    box-shadow: 0px 5px 10px 2px $header-button-hover-color
-    border-radius: 999rem
+    background-color: $header-button-color-hover
+    box-shadow: 0px 5px 10px 2px $header-button-color-hover
 
 .header-button-text
     margin: 0
@@ -48,4 +51,4 @@
     text-transform: uppercase
     color: $text-color
     font-weight: 500
-    font-size: 24px
+    font-size: 18px
