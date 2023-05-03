@@ -6,7 +6,7 @@ import (
 )
 
 type Config struct {
-	Socket     string
+	Socket   string
 	Port     string
 	Name     string
 	User     string

@@ -19,11 +19,11 @@ $header-button-color-hover: rgba(50, 50, 50, 1)
 $header-button-color: rgba(50, 50, 50, 0.6)
 $windows-color: $header-color
 $invisible: rgba(0, 0, 0, 0)
-$fields-color: #4F4F4F
+$fields-color: rgba(79, 79, 79, 1)
 $fields-placeholder-color: #AFAFAF
 $fields-border-color: rgb(100, 100, 100)
-
-
+$error-text-clr: rgb(255, 50, 50)
+   
 // ANIMATIONS 
 
 @keyframes slideDown
@@ -45,3 +45,32 @@ $fields-border-color: rgb(100, 100, 100)
 @mixin window-gradient()
     background-color: $header-color
     background: linear-gradient(120deg, $header-color, $sidebars-color)
+
+.form-field
+    box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.5)
+    outline: none
+    box-sizing: border-box
+    border-radius: 0.5rem
+    background-color: $fields-color
+    color: $fields-text-color
+    border: none
+    margin: 0 !important
+    padding-inline: 16px
+    height: 50px
+    width: 300px
+
+.form-error
+    text-align: start
+    margin: 5px 0px 7px
+    padding-inline: 20px
+    color: $error-text-clr
+
+.form-field:focus
+    border: 1px solid $fields-border-color
+
+.form-field::placeholder
+    color: $fields-placeholder-color
+    
+.form-field:-webkit-autofill .form-field:-webkit-autofill:hover .form-field:-webkit-autofill:focus .form-field:-webkit-autofill:active
+    -webkit-background-color: $fields-color !important
+

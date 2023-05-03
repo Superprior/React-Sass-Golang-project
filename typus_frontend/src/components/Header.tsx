@@ -15,13 +15,18 @@ function Header(): JSX.Element {
 		} 
 	}, []);
 
+	const switchWindows = () => {
+		setIsSignInWindowOpened(!isSignInWindowOpened);
+		setIsRegisterWindowOpened(!isRegisterWindowOpened);
+	}
+
     return (
 		<div className='page'>
 			{ isSignInWindowOpened ? (
-				<SignInWindow closeWindow={setIsSignInWindowOpened} />
+				<SignInWindow closeWindow={setIsSignInWindowOpened} switchWindows={switchWindows}/>
 			) : null }
 			{ isRegisterWindowOpened ? (
-				<RegisterWindow closeWindow={setIsRegisterWindowOpened} />
+				<RegisterWindow closeWindow={setIsRegisterWindowOpened} switchWindows={switchWindows}/>
 			) : null }
 			<div className='header-wrapper'>
 				<a 

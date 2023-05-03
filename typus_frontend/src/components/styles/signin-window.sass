@@ -15,8 +15,11 @@
 // Wrappers
 
 .signin-wrapper
+    justify-content: space-between
+    display: flex
+    flex-direction: column
     text-align: center
-    padding: 20px 10px
+    padding: 30px 10px 40px
     position: absolute
     border-radius: 2rem
     left: calc(100vw / 2 - 180px)
@@ -29,15 +32,49 @@
 
     @include window-gradient()
 
-.login-text
+.signin-text
     color: $text-color
     font-family: $font-exo
     margin: 0
 
-.login-form
+.signin-form
     position: relative
+    margin-top: 10px
 
-.form-field
-    outline: none
+.signin-buttons-wrapper
+    height: 40px
+    width: 220px
+    margin: 0px 60px
+    display: flex
+
+.signin-submit-button
+    width: 100px
     border-radius: 0.5rem
     border: none
+    cursor: pointer
+    background-color: rgba(79, 79, 79, 1)
+    transition-duration: .25s
+    font-weight: 600
+    font-size: 1rem
+    color: rgb(200, 200, 200)
+    box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.5)
+
+.signin-submit-button:hover
+    background-color: rgba(120, 120, 120, 1)
+
+.signin-goto-register-button
+    width: 120px
+    text-overflow: ellipsis
+    overflow: hidden
+    white-space: nowrap
+    padding-left: 10px
+    border-radius: 0.5rem
+    border: none
+    background-color: $invisible
+    color: $text-color
+    font-size: 1rem
+    cursor: pointer
+    font-weight: 600
+    
+.signin-goto-register-button:hover
+    text-decoration: underline
