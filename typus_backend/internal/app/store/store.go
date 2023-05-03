@@ -19,9 +19,9 @@ func New(config *Config) *Store {
 }
 
 func (s *Store) Open() error {
-	dbConnectionString := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=%s",
-		s.Config.Host, s.Config.Port, s.Config.Name,
-		s.Config.User, s.Config.Password, s.Config.SSLMode)
+	dbConnectionString := fmt.Sprintf("postgres:///%s?host=%s&sslmode=%s&user=%s&password=%s",
+		s.Config.Name, s.Config.Socket, s.Config.SSLMode,
+		s.Config.User, s.Config.Password)
 
 	db, err := sql.Open("postgres", dbConnectionString)
 	if err != nil {

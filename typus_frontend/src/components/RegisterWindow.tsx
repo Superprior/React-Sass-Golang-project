@@ -94,13 +94,19 @@ function RegisterWindow(props: Props): JSX.Element {
                         className='form-field'
                     />
 				</div>
-				<div className='register-submit-button-wrapper'>
+				<div className='register-buttons-wrapper'>
 					<button 
 						type='submit'
 						onClick={() => handleSubmit() }
 						className='register-submit-button'
 					>
 						Register
+					</button>
+					<button
+						onClick={() => props.closeWindow(false) }
+						className='register-goto-signin-button'
+					>
+						Sign in
 					</button>
 				</div>
 			</div>

@@ -6,7 +6,7 @@ import (
 )
 
 type Config struct {
-	Host     string
+	Socket     string
 	Port     string
 	Name     string
 	User     string
@@ -15,9 +15,9 @@ type Config struct {
 }
 
 func NewConfig() *Config {
-	host := os.Getenv("POSTGRES_HOST")
-	if host == "" {
-		log.Fatalf("Variable POSTGRES_HOST was not specified in the .env file")
+	socket := os.Getenv("POSTGRES_SOCKET")
+	if socket == "" {
+		log.Fatalf("Variable POSTGRES_SOCKET was not specified in the .env file")
 	}
 	port := os.Getenv("POSTGRES_PORT")
 	if port == "" {
@@ -41,7 +41,7 @@ func NewConfig() *Config {
 	}
 
 	return &Config{
-		Host:     host,
+		Socket:   socket,
 		Port:     port,
 		Name:     name,
 		User:     user,

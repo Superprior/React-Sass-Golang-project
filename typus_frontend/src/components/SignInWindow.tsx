@@ -1,7 +1,7 @@
 
 import React, { ChangeEvent, useState, useRef, useEffect } from 'react';
 import './styles/signin-window.sass'
-
+    
 interface Props {
 	closeWindow: Function
 }
@@ -9,7 +9,7 @@ interface Props {
 function SignInWindow(props: Props): JSX.Element {
 	const [username, setUsername] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
-
+    
 	const _ref = useRef(null);
 
 	useEffect(() => {
@@ -76,7 +76,7 @@ function SignInWindow(props: Props): JSX.Element {
 					<input 
                         type='password'
                         placeholder='Password'
-                        id='password' 
+						id='password'
                         value={password} 
                         onChange={(e: ChangeEvent<HTMLInputElement>) => handleInputChange(e)}
                         className='form-field'
