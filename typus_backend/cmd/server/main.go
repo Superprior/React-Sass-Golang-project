@@ -28,5 +28,5 @@ func main() {
 	}
 
 	// Run the server on port specified in .env file
-	s.Run("8080")
+	s.Run(serverPort)
 }

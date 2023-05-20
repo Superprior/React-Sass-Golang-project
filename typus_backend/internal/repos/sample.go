@@ -2,7 +2,7 @@ package repos
 
 import (
 	"backend/internal/models"
-	"backend/internal/store"
+	"backend/pkg/store"
 	"database/sql"
 	"fmt"
 )

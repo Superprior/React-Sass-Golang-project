@@ -11,13 +11,12 @@ import (
 )
 
 // Auth usecases.
-// Contains its repo.
+// Contains its repo to perform db queries.
 type AuthUsecase struct {
 	repo *repos.AuthRepo
 }
 
-// NewAuthUsercase
-// This function creates a new AuthUsecase.
+// Create a new AuthUsecase.
 func NewAuthUsecase() *AuthUsecase {
 	r, err := repos.NewAuthRepo()
 	if err != nil {
@@ -29,11 +28,11 @@ func NewAuthUsecase() *AuthUsecase {
 	}
 }
 
-// RegisterUser
 // This function implements usecase (inner logic) for user registration.
 func (u *AuthUsecase) RegisterUser(creds models.RegisterCredentials) (id int, err error) {
 
 	// Encrypt the provided password
+	// TODO: make a separate function for that
 
 	h := sha256.New()
 	h.Write([]byte(creds.Password))
@@ -44,7 +43,7 @@ func (u *AuthUsecase) RegisterUser(creds models.RegisterCredentials) (id int, er
 		Username:     creds.Username,
 		Email:        creds.Email,
 		EncryptedPwd: encrypted_pwd,
-		Role:         1,
+		Role:         models.USER,
 	}
 
 	// Call the repo method to insert the instance into the database

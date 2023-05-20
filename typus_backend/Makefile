@@ -25,12 +25,12 @@ makemigration:
 
 ## migrate_up: Run all the up migration files that were not applied to the database yet.
 migrate_up:
-	migrate -path migrations -database "postgres:///$(POSTGRES_NAME)?host=$(POSTGRES_SOCKET)&sslmode=$(POSTGRES_SSLMODE)&user=$(POSTGRES_USER)&password=$(POSTGRES_PASSWORD)" -verbose up
+	migrate -path migrations -database "postgres:///$(POSTGRES_NAME)?host=$(POSTGRES_HOST)&sslmode=$(POSTGRES_SSLMODE)&user=$(POSTGRES_USER)&password=$(POSTGRES_PASSWORD)" -verbose up
 
 
 ## migrate_down: Run the latest down migration file. 
 migrate_down:
-	migrate -path migrations -database "postgres:///$(POSTGRES_NAME)?host=$(POSTGRES_SOCKET)&sslmode=$(POSTGRES_SSLMODE)&user=$(POSTGRES_USER)&password=$(POSTGRES_PASSWORD)" -verbose down
+	migrate -path migrations -database "postgres:///$(POSTGRES_NAME)?host=$(POSTGRES_HOST)&sslmode=$(POSTGRES_SSLMODE)&user=$(POSTGRES_USER)&password=$(POSTGRES_PASSWORD)" -verbose down
 
 
 ## makemigration: Apply a certain migration version.
@@ -38,7 +38,7 @@ migrate_down:
 ## Usage: 
 ## 		make migrate_fix version="..."
 migrate_fix:
-	migrate -path migrations -database "postgres:///$(POSTGRES_NAME)?host=$(POSTGRES_SOCKET)&sslmode=$(POSTGRES_SSLMODE)&user=$(POSTGRES_USER)&password=$(POSTGRES_PASSWORD)" force $(version)
+	migrate -path migrations -database "postgres:///$(POSTGRES_NAME)?host=$(POSTGRES_HOST)&sslmode=$(POSTGRES_SSLMODE)&user=$(POSTGRES_USER)&password=$(POSTGRES_PASSWORD)" force $(version)
 
 
 # Setting default make target to build.

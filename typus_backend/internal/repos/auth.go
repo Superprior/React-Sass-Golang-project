@@ -1,102 +1,121 @@
 package repos
 
 import (
+	"backend/internal/errors"
 	"backend/internal/models"
-	"backend/internal/store"
+	"backend/pkg/store"
 	"database/sql"
-	"fmt"
+	"log"
+
+	"github.com/lib/pq"
 )
 
-// Auth repository.
-// Contains the store in order to hit the database using provided connection.
+// Default representation of the auth repository.
+// Contains the store in order to query the database.
 type AuthRepo struct {
 	store *store.Store
 }
 
-// NewAuthRepo
-// This function creates a new AuthRepo.
-func NewAuthRepo() (*AuthRepo, error) {
+// Create a new AuthRepo.
+func NewAuthRepo() (repo *AuthRepo, err error) {
 	sConf := store.NewConfig()
 	s := store.New(sConf)
 
-	if err := s.Open(); err != nil {
-		return nil, err
+	if err = s.Open(); err != nil {
+		log.Fatal("Could not create AuthRepo")
 	}
 
-	return &AuthRepo{
-		store: s,
-	}, nil
+	repo = &AuthRepo{store: s}
+	return
 }
 
-// CreateUser
-// This function creates a new user in the database using provided data.
+// Create a new user in the database using provided data.
 func (r *AuthRepo) CreateInstance(user *models.User) (*models.User, error) {
 
-	// Firstly check if a user with the same username/email already exists.
-	// This error cannot be handled after the insert is done, so the select query
-	// needs to be executed in the first place.
+	// Construct the query and query the database
+	query := `
+		INSERT INTO users (username, email, role, encrypted_pwd) 
+		VALUES ($1, $2, $3, $4) 
+		RETURNING id;`
 
-	var id int
-	query := fmt.Sprintf("SELECT id FROM users WHERE username='%s' OR email='%s'", user.Username, user.Email)
-	err := r.store.DB.QueryRow(query).Scan(&id)
+	err := r.store.DB.
+		QueryRow(query, user.Username, user.Email, user.Role, user.EncryptedPwd).
+		Scan(&user.ID)
 
-	if err != sql.ErrNoRows {
-		return nil, fmt.Errorf("User with the same username or email already exists")
-	}
-
-	// Create the query
-	query = fmt.Sprintf(
-		"INSERT INTO users (username, email, role, encrypted_pwd) VALUES ('%s', '%s', %d, '%s') RETURNING id;",
-		user.Username, user.Email, user.Role, user.EncryptedPwd,
-	)
-
-	// Perform the query and get the id
-	err = r.store.DB.QueryRow(query).Scan(&user.ID)
-
+	// Check for insertion errors
 	if err != nil {
-		return nil, err
+		if pqErr, ok := err.(*pq.Error); ok {
+			switch pqErr.Code.Name() {
+			case "unique_violation":
+				if pqErr.Constraint == "users_username_key" {
+					err = errors.ErrNonUniqueEmail
+					return nil, err
+				} else if pqErr.Constraint == "users_email_key" {
+					err = errors.ErrNonUniqueEmail
+					return nil, err
+				}
+			default:
+				{
+					err = errors.ErrServerError
+					return nil, err
+				}
+			}
+		}
 	}
 
 	// Return the same user but with the id
 	return user, nil
 }
 
-// GetUserByEmail
-// This function get the user from the database by the provided email.
-func (r *AuthRepo) GetInstanceByEmail(email string) (*models.User, error) {
+// Get the user from the database using provided email.
+func (r *AuthRepo) GetInstanceByEmail(email string) (user *models.User, err error) {
 
-	// Create the query
-	query := fmt.Sprintf("SELECT id, username, email, role, encrypted_pwd FROM users WHERE email='%s'", email)
-	var user models.User
+	// Construct the query and query the database
+	query := `
+		SELECT id, username, email, role, encrypted_pwd 
+		FROM users 
+		WHERE email=$1;`
 
 	// Perform the query and get the user's data
-	err := r.store.DB.QueryRow(query).Scan(&user.ID, &user.Username, &user.Email, &user.Role, &user.EncryptedPwd)
+	err = r.store.DB.
+		QueryRow(query, email).
+		Scan(&user.ID, &user.Username, &user.Email, &user.Role, &user.EncryptedPwd)
 
+	// Check for errors and return if everything's fine
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("No user with such email")
+			err = errors.ErrNoUserWithEmail
+			return
 		}
-		return nil, err
+		err = errors.ErrServerError
+		return
 	}
-	return &user, nil
+	return
 }
 
 // GetUserByEmail
 // This function get the user from the database by the provided email.
-func (r *AuthRepo) GetInstanceByUsername(username string) (*models.User, error) {
+func (r *AuthRepo) GetInstanceByUsername(username string) (user *models.User, err error) {
 
-	// Create the query
-	query := fmt.Sprintf("SELECT id, username, email, role, encrypted_pwd FROM users WHERE username='%s'", username)
-	var user models.User
+	// Construct the query and query the database
+	query := `
+		SELECT id, username, email, role, encrypted_pwd 
+		FROM users 
+		WHERE username=$1`
 
 	// Perform the query and get the user's data
-	err := r.store.DB.QueryRow(query).Scan(&user.ID, &user.Username, &user.Email, &user.Role, &user.EncryptedPwd)
+	err = r.store.DB.
+		QueryRow(query, username).
+		Scan(&user.ID, &user.Username, &user.Email, &user.Role, &user.EncryptedPwd)
 
+	// Check for errors and return if everything's fine
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("No user with such username")
+			err = errors.ErrNoUserWithUsername
+			return
 		}
-		return nil, err
+		err = errors.ErrServerError
+		return
 	}
-	return &user, nil
+	return
 }
