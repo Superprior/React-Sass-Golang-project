@@ -6,48 +6,39 @@ import (
 	"log"
 )
 
+// Sample usecase definition.
+// Contains its repo to perform db queries.
 type SampleUsecase struct {
 	repo *repos.SampleRepo
 }
 
-func NewSampleUsecase() *SampleUsecase {
+func NewSampleUsecase() (uc *SampleUsecase) {
 	r, err := repos.NewSampleRepo()
 	if err != nil {
 		log.Fatal("Could not create the SampleRepo")
 	}
 
-	return &SampleUsecase{
-		repo: r,
-	}
+	uc = &SampleUsecase{repo: r}
+	return
 }
 
-func (u *SampleUsecase) GetAllSamples() ([]*models.Sample, error) {
-	samples, err := u.repo.GetList()
+// Usecase (inner logic) for getting the samples list.
+func (u *SampleUsecase) GetAllSamples() (samples []*models.Sample, err error) {
 
-	if err != nil {
-		return nil, err
-	}
-	return samples, nil
+	samples, err = u.repo.GetList()
+	return
 }
 
-func (u *SampleUsecase) GetSampleById(id int) (*models.Sample, error) {
+// Usecase (inner logic) for getting a sample by id.
+func (u *SampleUsecase) GetSampleById(id int) (sample *models.Sample, err error) {
 
-	sample, err := u.repo.GetInstanceById(id)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return sample, nil
+	sample, err = u.repo.GetInstanceById(id)
+	return
 }
 
-func (u *SampleUsecase) CreateSample(sample *models.Sample) (*models.Sample, error) {
+// Usecase (inner logic) for creating a new sample.
+func (u *SampleUsecase) CreateSample(sampleReceived *models.Sample) (sampleReturned *models.Sample, err error) {
 
-	sample, err := u.repo.CreateInstance(sample)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return sample, nil
+	sampleReturned, err = u.repo.CreateInstance(sampleReceived)
+	return
 }
