@@ -6,6 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Server struct definition.
+// Contains Gin engine, all handlers and the logger.
 type APIServer struct {
 	Server        *gin.Engine
 	AuthHandler   *handlers.Handler
@@ -13,7 +15,8 @@ type APIServer struct {
 	// logger *logger.Logger
 }
 
-func NewAPIServer() *APIServer {
+// Create a new APIServer instance.
+func NewAPIServer() (s *APIServer) {
 	server := gin.Default()
 	var authHandler handlers.Handler = handlers.NewAuthHandler()
 	var sampleHandler handlers.Handler = handlers.NewSampleHandler()
@@ -24,13 +27,15 @@ func NewAPIServer() *APIServer {
 		sampleHandler.Routes(api.Group("/samples"))
 	}
 
-	return &APIServer{
+	s = &APIServer{
 		Server:        server,
 		AuthHandler:   &authHandler,
 		SampleHandler: &sampleHandler,
 	}
+	return
 }
 
+// Run the APIServer.
 func (s *APIServer) Run(port string) {
 	s.Server.Run(":" + port)
 }
