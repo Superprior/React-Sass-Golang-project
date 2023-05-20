@@ -1,7 +1,7 @@
 **/node_modules/
 /typus_frontend/package-lock.json
 /typus_backend/main
-/typus_backend/apiserver
+/typus_backend/server
 **/*.env
 **/*.exe
 **/*.vscode

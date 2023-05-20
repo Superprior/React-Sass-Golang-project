@@ -1,140 +1,109 @@
 package repos
 
 import (
+	"backend/internal/errors"
 	"backend/internal/models"
 	"backend/pkg/store"
 	"database/sql"
-	"fmt"
+	"log"
+
+	"github.com/lib/pq"
 )
 
+// Default representation of the sample repository.
+// Contains the store in order to query the database.
 type SampleRepo struct {
 	store *store.Store
 }
 
-func NewSampleRepo() (*SampleRepo, error) {
+// Create a new SampleRepo.
+func NewSampleRepo() (repo *SampleRepo, err error) {
 	sConf := store.NewConfig()
 	s := store.New(sConf)
 
-	if err := s.Open(); err != nil {
-		return nil, err
+	if err = s.Open(); err != nil {
+		log.Fatal("Could not create SampleRepo")
 	}
 
-	return &SampleRepo{
-		store: s,
-	}, nil
+	repo = &SampleRepo{store: s}
+	return
 }
 
-func (r *SampleRepo) GetList() ([]*models.Sample, error) {
+// Get a list of all samples.
+func (r *SampleRepo) GetList() (samples []*models.Sample, err error) {
 
-	// Use GetInstanceById function for every ID to avoid nesting
+	// Construct query and query the database
 
-	query := fmt.Sprintf("SELECT id FROM code_samples;")
+	query := `
+		SELECT (id, title, content, language)
+		FROM code_samples;`
 
 	rows, err := r.store.DB.Query(query)
 
 	if err != nil {
-		return nil, err
+		err = errors.ErrServerError
+		return
 	}
 	defer rows.Close()
 
-	var samples []*models.Sample
+	// Handle every row separately to unnest its Content field
 
 	for rows.Next() {
-		var id int
+		var sample models.Sample
 
-		if err := rows.Scan(&id); err != nil {
-			return nil, err
+		// Get the sample id
+		if err = rows.Scan(&sample.ID, &sample.Title, pq.Array(&sample.Content), &sample.Language); err != nil {
+			err = errors.ErrServerError
+			return
 		}
 
-		sample, err := r.GetInstanceById(id)
-		if err != nil {
-			return nil, err
-		}
-		samples = append(samples, sample)
+		samples = append(samples, &sample)
 	}
-
-	return samples, nil
+	return
 }
 
-func (r *SampleRepo) GetInstanceById(id int) (*models.Sample, error) {
+// Get sample instance with the provided id.
+func (r *SampleRepo) GetInstanceById(id int) (sample *models.Sample, err error) {
 
-	// Perform select query to check if the instance with that id exists
+	// Construct the query and query the database
+	query := `
+		SELECT id, title, content, language 
+		FROM code_samples 
+		WHERE id=$1;`
 
-	var _id int
-	query := fmt.Sprintf("SELECT id FROM code_samples WHERE id=%d;", id)
+	err = r.store.DB.
+		QueryRow(query, id).
+		Scan(&sample.ID, &sample.Title, pq.Array(&sample.Content), &sample.Language)
 
-	err := r.store.DB.QueryRow(query).Scan(&_id)
-
+	// Check for errors and return if everything's fine
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("Sample with id %d does not exist", id)
+			err = errors.ErrNoSampleWithId
+			return
 		}
-		return nil, err
+		err = errors.ErrServerError
+		return
 	}
-
-	// Use unnest function from postgres to separate the code lines
-	query = fmt.Sprintf("SELECT id, title, unnest(content), language FROM code_samples WHERE id=%d;", id)
-
-	// Perform the query
-	rows, err := r.store.DB.Query(query)
-
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("Sample with id %d does not exist", id)
-		}
-		return nil, err
-	}
-	defer rows.Close()
-
-	// Loop through the list of rows and create an array of lines
-	var sample models.Sample
-	var lines []string
-
-	for rows.Next() {
-		var line string
-
-		if err := rows.Scan(&sample.ID, &sample.Title, &line, &sample.Language); err != nil {
-			return nil, err
-		}
-
-		lines = append(lines, line)
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-
-	sample.Content = lines
-	return &sample, nil
+	return
 }
 
-func (r *SampleRepo) CreateInstance(sample *models.Sample) (*models.Sample, error) {
+// Create a new sample instance with the provided data.
+func (r *SampleRepo) CreateInstance(sampleReceived *models.Sample) (sampleReturned *models.Sample, err error) {
 
-	// Create postgres representation of the array to insert
+	// Construct the query and query the database
 
-	linesString := "["
+	query := `
+		INSERT INTO code_samples (title, content, language) 
+		VALUES ($1, $2, $3) 
+		RETURNING (id, title, content, language);`
 
-	for i, line := range sample.Content {
-		linesString += "'" + line + "'"
-		if i != len(sample.Content)-1 {
-			linesString += ", "
-		}
-	}
-	linesString += "]"
-
-	// Perform the insert
-
-	query := fmt.Sprintf(
-		"INSERT INTO code_samples (title, content, language) VALUES ('%s', ARRAY%s, '%s') RETURNING id;",
-		sample.Title, linesString, sample.Language,
-	)
-
-	// Get the created sample's id and check for errors
-	err := r.store.DB.QueryRow(query).Scan(&sample.ID)
+	// Get the created sample and check for errors
+	err = r.store.DB.
+		QueryRow(query, sampleReceived.Title, pq.Array(sampleReceived.Content), sampleReceived.Language).
+		Scan(&sampleReturned.ID, &sampleReturned.Title, pq.Array(&sampleReturned.Content), &sampleReturned.Language)
 
 	if err != nil {
-		return nil, err
+		err = errors.ErrServerError
 	}
-
-	return sample, nil
+	return
 }
