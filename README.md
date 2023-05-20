@@ -26,3 +26,4 @@ Typus is a website created for practising quick code typing. No third-party fron
 - Tab logic
 - Errors highlighting
 - Reseting the attempt
+

@@ -4,5 +4,4 @@
 /typus_backend/apiserver
 **/*.env
 **/*.exe
-**/*.sum
 **/*.vscode

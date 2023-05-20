@@ -7,12 +7,12 @@ include .env
 ## build: Build the executable file
 .PHONY: build
 build:
-	go build -v ./cmd/apiserver/
+	go build -v ./cmd/server/
 
 
-## test: Run all tests (tests are not added yet)
+## test: Run all testst
 test:
-	go test -v -race -timeout 30s ./...
+	go test -v ./...
 
 
 ## makemigration: Create up and down migration files in /migrations directory.
