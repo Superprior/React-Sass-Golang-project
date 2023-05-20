@@ -30,19 +30,19 @@ func NewAuthRepo() (repo *AuthRepo, err error) {
 }
 
 // Create a new user in the database using provided data.
-func (r *AuthRepo) CreateInstance(user *models.User) (*models.User, error) {
+func (r *AuthRepo) CreateInstance(userReceived *models.User) (userReturned *models.User, err error) {
 
 	// Construct the query and query the database
 	query := `
 		INSERT INTO users (username, email, role, encrypted_pwd) 
 		VALUES ($1, $2, $3, $4) 
-		RETURNING id;`
+		RETURNING (id, username, email, role, encrypted_pwd);`
 
-	err := r.store.DB.
-		QueryRow(query, user.Username, user.Email, user.Role, user.EncryptedPwd).
-		Scan(&user.ID)
+	err = r.store.DB.
+		QueryRow(query, userReceived.Username, userReceived.Email, userReceived.Role, userReceived.EncryptedPwd).
+		Scan(&userReturned.ID, &userReturned.Username, &userReturned.Email, &userReturned.Role, &userReturned.EncryptedPwd)
 
-	// Check for insertion errors
+	// Check for insertion errors and return if everything's fine
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
 			switch pqErr.Code.Name() {
@@ -62,9 +62,7 @@ func (r *AuthRepo) CreateInstance(user *models.User) (*models.User, error) {
 			}
 		}
 	}
-
-	// Return the same user but with the id
-	return user, nil
+	return
 }
 
 // Get the user from the database using provided email.
@@ -93,8 +91,7 @@ func (r *AuthRepo) GetInstanceByEmail(email string) (user *models.User, err erro
 	return
 }
 
-// GetUserByEmail
-// This function get the user from the database by the provided email.
+// Get the user from the database by the provided email.
 func (r *AuthRepo) GetInstanceByUsername(username string) (user *models.User, err error) {
 
 	// Construct the query and query the database
