@@ -1,34 +1,33 @@
 package usecases
 
 import (
+	"backend/internal/errors"
 	"backend/internal/models"
 	"backend/internal/repos"
 	"backend/pkg/jwt_funcs"
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 	"log"
 )
 
-// Auth usecases.
+// Auth usecase definition.
 // Contains its repo to perform db queries.
 type AuthUsecase struct {
 	repo *repos.AuthRepo
 }
 
 // Create a new AuthUsecase.
-func NewAuthUsecase() *AuthUsecase {
+func NewAuthUsecase() (uc *AuthUsecase) {
 	r, err := repos.NewAuthRepo()
 	if err != nil {
 		log.Fatal("Could not create the AuthRepo")
 	}
 
-	return &AuthUsecase{
-		repo: r,
-	}
+	uc = &AuthUsecase{repo: r}
+	return
 }
 
-// This function implements usecase (inner logic) for user registration.
+// Usecase (inner logic) for user registration.
 func (u *AuthUsecase) RegisterUser(creds models.RegisterCredentials) (id int, err error) {
 
 	// Encrypt the provided password
@@ -47,22 +46,17 @@ func (u *AuthUsecase) RegisterUser(creds models.RegisterCredentials) (id int, er
 	}
 
 	// Call the repo method to insert the instance into the database
-	user, err = u.repo.CreateInstance(user)
+	createdUser, err := u.repo.CreateInstance(user)
+	id = createdUser.ID
 
-	if err != nil {
-		return 0, err
-	}
-
-	// Return the ID of the created user
-	return user.ID, nil
+	return
 }
 
-// LoginUser
-// This function implements usecase (inner logic) for logging users in.
+// Usecase (inner logic) for logging users in.
 func (u *AuthUsecase) LoginUser(creds models.LoginCredentials) (token string, err error) {
 	var user *models.User
 
-	// Determine if username of email was provided
+	// Determine if username or email was provided
 	if creds.Email == "" {
 		user, err = u.repo.GetInstanceByUsername(creds.Username)
 	} else {
@@ -70,7 +64,7 @@ func (u *AuthUsecase) LoginUser(creds models.LoginCredentials) (token string, er
 	}
 
 	if err != nil {
-		return "", err
+		return
 	}
 
 	// Encrypt the provided password
@@ -80,13 +74,14 @@ func (u *AuthUsecase) LoginUser(creds models.LoginCredentials) (token string, er
 
 	// Compare the provided' and database's password hashes
 	if user.EncryptedPwd == creds_encrypted_pwd {
-		token, err := jwt_funcs.GenerateJWT(user.Username, user.Email, int8(user.Role))
+		token, err = jwt_funcs.GenerateJWT(user.Username, user.Email, int8(user.Role))
 		if err != nil {
-			return "", err
+			err = errors.ErrServerError
+			return
 		}
-
-		return token, nil
+		return
 	} else {
-		return "", fmt.Errorf("Incorrect password provided")
+		err = errors.ErrInvalidCredentials
+		return
 	}
 }
